@@ -39,6 +39,27 @@ void func(int sockfd)
 	} 
 } 
 
+void  sendmsgper(int sockfd){
+    char buff[MAX];
+    int n;
+    bzero(buff, MAX); 
+
+		// read the message from client and copy it in buffer 
+		read(sockfd, buff, sizeof(buff)); 
+		// print buffer which contains the client contents 
+		printf("From client: %s\t To client : ", buff); 
+		bzero(buff, MAX); 
+		n = 0; 
+		// copy server message in the buffer 
+        while ((buff[n++] = getchar()) != '\n') 
+			; 
+
+		// and send that buffer to client 
+		write(sockfd, buff, sizeof(buff));
+        
+
+}
+
 // Driver function 
 int main() 
 { 
@@ -87,8 +108,11 @@ int main()
 		printf("server acccept the client...\n"); 
 
 	// Function for chatting between client and server 
-	func(connfd); 
+	// func(connfd); 
+    
 
 	// After chatting close the socket 
-	close(sockfd); 
+	// close(sockfd); 
 } 
+
+

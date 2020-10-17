@@ -14,10 +14,12 @@ void func(int sockfd)
 		bzero(buff, sizeof(buff)); 
 		printf("Enter the string : "); 
 		n = 0; 
-		while ((buff[n++] = getchar()) != '\n') 
-			; 
+		// while ((buff[n++] = getchar()) != '\n') 
+		// 	; 
+        buff[MAX]="esto es una pruena";
 		write(sockfd, buff, sizeof(buff)); 
 		bzero(buff, sizeof(buff)); 
+
 		read(sockfd, buff, sizeof(buff)); 
 		printf("From Server : %s", buff); 
 		if ((strncmp(buff, "exit", 4)) == 0) { 
@@ -26,7 +28,27 @@ void func(int sockfd)
 		} 
 	} 
 } 
+// void getmsg(int sockdf){
+//     char buff[MAX]; 
+// 	int n; 
+// 	for (;;) { 
+// 		bzero(buff, sizeof(buff)); 
+// 		printf("Enter the string : "); 
+// 		n = 0; 
+// 		while ((buff[n++] = getchar()) != '\n') 
+// 			; 
+// 		write(sockfd, buff, sizeof(buff)); 
+// 		bzero(buff, sizeof(buff)); 
+// 		read(sockfd, buff, sizeof(buff)); 
 
+// 		printf("From Server : %s", buff); 
+// 		if ((strncmp(buff, "exit", 4)) == 0) { 
+// 			printf("Client Exit...\n"); 
+// 			break; 
+// 		} 
+// 	} 
+
+// }
 int main() 
 { 
 	int sockfd, connfd; 
@@ -56,8 +78,10 @@ int main()
 		printf("connected to the server..\n"); 
 
 	// function for chat 
-	func(sockfd); 
+	// func(sockfd); 
+
+    
 
 	// close the socket 
-	close(sockfd); 
+	// close(sockfd); 
 } 

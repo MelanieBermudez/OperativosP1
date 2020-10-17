@@ -6,6 +6,7 @@
 #include <fcntl.h>
 
 
+
 #define MAXCHAR 1000
 int algoritmo,modo;
 
@@ -94,6 +95,10 @@ int main(int argc, char*argv[])
             //automatico
             auto_file();
         }
+
+
+
+
     }
     
 	
