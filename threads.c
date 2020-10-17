@@ -41,7 +41,7 @@ void yourturn(){
 		
 	}
 }
-int main(int argc, char*argv[])
+int main (int argc, char*argv[])
 
 {
 	//Prueba threads 
@@ -76,3 +76,6 @@ int main(int argc, char*argv[])
 
 	return 0;
 }
+
+
+
