@@ -11,6 +11,7 @@
 #define MAX 80 
 #define PORT 8080 
 #define SA struct sockaddr 
+int algoritmo;
 
 
 
@@ -95,29 +96,49 @@ void conectar()
 } 
 
 int main (int argc, char*argv[]){
+	printf("---------- Menu de opciones ---------- ");
+    printf("\nSeleccione el algoritmo: ");
+    printf("\n 1. FIFO ");
+    printf("\n 2. SJF ");
+    printf("\n 3. HPF ");
+    printf("\n 4. ROUND ROBIN \n");
+	printf("\n 5. Salir \n");
+	
+	scanf("%d", &algoritmo);
+	switch(algoritmo){
+			case 1:
+				//FCFS(P,n);
+				break;
+			case 2:
+				//SJF_P(P,n);
+				break;
+			case 3:
+				//SJF_NP(P,n);
+				break;
+			case 4:
+				//PRT_P(P,n);
+				break;
+			case 5: exit(0);
+		}
 
-    //aqui va a llegar un msj 
-
-    //recibimos el mensaje con job_sched y lo metemos a la cola []
 
 
-    //job scheduler 
-    pthread_t job_sched;
-    pthread_create(&job_sched,NULL,job_scheduler_info,"msj");
 
-    //read socket
+    // //job scheduler 
+    // pthread_t job_sched;
+    // pthread_create(&job_sched,NULL,job_scheduler_info,"msj");
 
-    //cpu scheduler 
-    pthread_t cpu_sched;
-    pthread_create(&cpu_sched,NULL,cpu_scheduler_info,"msj2");
+    // //read socket
 
-    pthread_join(&job_sched,NULL);
+    // //cpu scheduler 
+    // pthread_t cpu_sched;
+    // pthread_create(&cpu_sched,NULL,cpu_scheduler_info,"msj2");
 
-    printf("\n");
+    // pthread_join(&job_sched,NULL);
 
-    conectar();
-    //recibir_msj(res);
-   // enviar_msj(res);
+    // printf("\n");
+
+    // conectar();
 
 
 
