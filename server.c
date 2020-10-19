@@ -14,10 +14,10 @@ void func(int sockfd)
 { 
 	char buff[MAX]; 
 	int n; 
+	
 	// infinite loop for chat 
-	// for (int i =0; i<2; i++) { 
+	for (;;) { 
 		bzero(buff, MAX); 
-
 		// read the message from client and copy it in buffer 
 		read(sockfd, buff, sizeof(buff)); 
 		// print buffer which contains the client contents 
@@ -25,8 +25,7 @@ void func(int sockfd)
 		bzero(buff, MAX); 
 		n = 0; 
 		// copy server message in the buffer 
-		while ((buff[n++] = getchar()) != '\n') 
-			; 
+		while ((buff[n++] = getchar()) != '\n'); 
 
 		// and send that buffer to client 
 		write(sockfd, buff, sizeof(buff)); 
@@ -36,7 +35,7 @@ void func(int sockfd)
 			printf("Server Exit...\n"); 
 			// break; 
 		} 
-	// } 
+	} 
 } 
 
 // Driver function 

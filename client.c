@@ -6,35 +6,79 @@
 #define MAX 80 
 #define PORT 8080 
 #define SA struct sockaddr 
+//Define para menu consola
+#define MAXCHAR 1000
+int modo,flag;
+
 
 void func(int sockfd) 
 { 
 	char buff[MAX]; 
 	int n; 
-	// for (int i =0; i<2;i++) { 
-		bzero(buff, sizeof(buff)); 
-		printf("Enter the string : "); 
-		n = 0; 
-		while ((buff[n++] = getchar()) != '\n') 
-			; 
-        buff[MAX]="esto es una pruena";
-		write(sockfd, buff, sizeof(buff)); 
-		bzero(buff, sizeof(buff)); 
+	FILE *fp;
+	
+	char* filename= "procesos.txt";
+    int burst, prioridad;
 
-		read(sockfd, buff, sizeof(buff)); 
-		printf("From Server : %s", buff); 
-		if ((strncmp(buff, "exit", 4)) == 0) { 
-			printf("Client Exit...\n"); 
-			// break; 
+	fp = fopen(filename,"r");
+	if (fp==NULL){
+		printf("Could not open file %s", filename);
+	}
+	for (;;) { 
+		bzero(buff, sizeof(buff)); 
+		while(fgets(buff,MAXCHAR,fp)!=NULL){
+			printf("%s", buff);
+			//esperar 2 segundos
+			sleep(2);
+
+			//enviar informacion    
+			write(sockfd, buff, sizeof(buff)); 
+			bzero(buff, sizeof(buff)); 
+
+			read(sockfd, buff, sizeof(buff)); 
+			printf("From Server : %s", buff); 
+
+			//sleep(5)
 		} 
+		fclose(fp);    
+
+	}
+	
 	
 } 
+
+char read_file(){
+    FILE *fp;
+	char str[MAXCHAR];
+	char* filename= "procesos.txt";
+    int burst, prioridad;
+
+	fp = fopen(filename,"r");
+	if (fp==NULL){
+		printf("Could not open file %s", filename);
+		return 1;
+	}
+	while(fgets(str,MAXCHAR,fp)!=NULL){
+		printf("%s", str);
+        //esperar 2 segundos
+        sleep(2);
+        //enviar informacion    
+        //sleep(5)
+    }    
+	fclose(fp);
+	return str;
+}
+
+void auto_file(){
+    int pid,burst,prioridad;
+	
+}
 
 int main() 
 { 
 	int sockfd, connfd; 
 	struct sockaddr_in servaddr, cli; 
-
+	
 	// socket create and varification 
 	sockfd = socket(AF_INET, SOCK_STREAM, 0); 
 	if (sockfd == -1) { 
@@ -55,14 +99,34 @@ int main()
 		printf("connection with the server failed...\n"); 
 		exit(0); 
 	} 
-	else
+	else{
 		printf("connected to the server..\n"); 
-
+	}
 	// function for chat 
-	func(sockfd); 
+	//func(sockfd); 
+	printf("---------- Menu de opciones ---------- ");
 
-    
+    printf("\nSeleccione el modo: ");
+    printf("\n 1. MANUAL ");
+    printf("\n 2. AUTOMATICO \n");
 
+    scanf("%d", &modo);
+	if(modo==1){
+		//manual
+		func(sockfd);
+		return 0;
+		
+	}
+	else{
+		//automatico
+		int rango;
+		printf("\nIndique el rango de valores para los procesos : ");
+		scanf("%d", &rango);
+
+		auto_file();
+		return 0;
+	}
+	
 	// close the socket 
 	// close(sockfd); 
 } 

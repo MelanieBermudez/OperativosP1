@@ -30,7 +30,7 @@ void * cpu_scheduler_info(void * arg){
 }
 
 void recibir_msj(int n){
-	printf("recibir mensaje")
+	printf("recibir mensaje");
     char buff[80];
     read(n,buff,sizeof(buff));
     printf(buff);

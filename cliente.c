@@ -76,7 +76,6 @@ int read_file(){
 	}
     
 	while(fgets(str,MAXCHAR,fp)!=NULL){
-		
         //crear hilo
         // pthread_t newthread;
 	    // pthread_create(&newthread,NULL,myturn,str);
@@ -85,27 +84,20 @@ int read_file(){
         //sleep(2);
 
         //enviar informacion 
-       
     
         // enviar_msjcli(res);
         // recibir_msjcli(res);
         
-
         //sleep(5);
         
     }    
 	fclose(fp);
-
 	return 0;
-
-    
 }
 
 void auto_file(){
     int pid,burst,prioridad;
 	
-    
-
 }
 
 
