@@ -15,7 +15,7 @@ void func(int sockfd)
 	char buff[MAX]; 
 	int n; 
 	// infinite loop for chat 
-	for (;;) { 
+	// for (int i =0; i<2; i++) { 
 		bzero(buff, MAX); 
 
 		// read the message from client and copy it in buffer 
@@ -34,9 +34,9 @@ void func(int sockfd)
 		// if msg contains "Exit" then server exit and chat ended. 
 		if (strncmp("exit", buff, 4) == 0) { 
 			printf("Server Exit...\n"); 
-			break; 
+			// break; 
 		} 
-	} 
+	// } 
 } 
 
 // Driver function 
@@ -88,7 +88,10 @@ int main()
 
 	// Function for chatting between client and server 
 	func(connfd); 
+    
 
 	// After chatting close the socket 
-	close(sockfd); 
+	// close(sockfd); 
 } 
+
+
