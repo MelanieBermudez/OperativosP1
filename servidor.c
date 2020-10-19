@@ -29,6 +29,7 @@ void * cpu_scheduler_info(void * arg){
 }
 
 void recibir_msj(int n){
+	printf("recibir mensaje")
     char buff[80];
     read(n,buff,sizeof(buff));
     printf(buff);
@@ -43,6 +44,23 @@ void enviar_msj(int n){
     printf(buff);
 
 }
+void func(int sockfd) 
+{ 
+	char buff[MAX]; 
+	int n; 
+
+	bzero(buff, sizeof(buff)); 
+	printf("Enter the string : "); 
+	n = 0; 
+	while ((buff[n++] = getchar()) != '\n') 
+		; 
+	write(sockfd, buff, sizeof(buff)); 
+	bzero(buff, sizeof(buff)); 
+	read(sockfd, buff, sizeof(buff)); 
+	printf("From Server : %s", buff); 
+
+	
+} 
 
 void conectar() 
 { 
@@ -77,6 +95,7 @@ void conectar()
 		printf("Listen failed...\n"); 
 		exit(0); 
 	} 
+
 	else
 		printf("Server listening..\n"); 
 	len = sizeof(cli); 
@@ -89,9 +108,12 @@ void conectar()
 	} 
 	else{
 		printf("server acccept the client...\n"); 
-        recibir_msj(sockfd);
+
     }
-    //return sockfd;    
+
+	func(sockfd);
+
+    // return sockfd;    
 } 
 
 int main (int argc, char*argv[]){
@@ -102,22 +124,26 @@ int main (int argc, char*argv[]){
 
 
     //job scheduler 
-    pthread_t job_sched;
-    pthread_create(&job_sched,NULL,job_scheduler_info,"msj");
+    // pthread_t job_sched;
+    // pthread_create(&job_sched,NULL,job_scheduler_info,"msj");
 
-    //read socket
+    // //read socket
 
-    //cpu scheduler 
-    pthread_t cpu_sched;
-    pthread_create(&cpu_sched,NULL,cpu_scheduler_info,"msj2");
+    // //cpu scheduler 
+    // pthread_t cpu_sched;
+    // pthread_create(&cpu_sched,NULL,cpu_scheduler_info,"msj2");
 
-    pthread_join(&job_sched,NULL);
+    // pthread_join(&job_sched,NULL);
 
-    printf("\n");
+    // printf("\n");
 
-    conectar();
-    //recibir_msj(res);
-   // enviar_msj(res);
+	conectar();
+
+    // recibir_msj(res);
+
+
+   	// enviar_msj(res);
+	int a =4312313;
 
 
 

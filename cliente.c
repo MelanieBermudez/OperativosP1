@@ -43,9 +43,10 @@ void enviar_msjcli(int n){
 
 void func(int sockfd) 
 { 
+    printf('JOA;');
 	char buff[MAX]; 
 	int n; 
-	for (;;) { 
+	
 		bzero(buff, sizeof(buff)); 
 		printf("Enter the string : "); 
 		n = 0; 
@@ -55,11 +56,8 @@ void func(int sockfd)
 		bzero(buff, sizeof(buff)); 
 		read(sockfd, buff, sizeof(buff)); 
 		printf("From Server : %s", buff); 
-		if ((strncmp(buff, "exit", 4)) == 0) { 
-			printf("Client Exit...\n"); 
-			break; 
-		} 
-	} 
+
+	
 } 
 
 int read_file(){
@@ -68,7 +66,8 @@ int read_file(){
 	char* filename= "procesos.txt";
     int burst, prioridad;
 
-
+    // int res = sockets();
+    // enviar_msjcli(res);
 	fp = fopen(filename,"r");
 	if (fp==NULL){
 		printf("Could not open file %s", filename);
@@ -78,17 +77,17 @@ int read_file(){
 	while(fgets(str,MAXCHAR,fp)!=NULL){
 		
         //crear hilo
-        pthread_t newthread;
-	    pthread_create(&newthread,NULL,myturn,str);
+        // pthread_t newthread;
+	    // pthread_create(&newthread,NULL,myturn,str);
 
         //esperar 2 segundos
         //sleep(2);
 
         //enviar informacion 
-        int res = sockets();
+       
     
-        enviar_msjcli(res);
-        recibir_msjcli(res);
+        // enviar_msjcli(res);
+        // recibir_msjcli(res);
         
 
         sleep(5);
@@ -108,7 +107,7 @@ void auto_file(){
 }
 
 
-int sockets() 
+void sockets() 
 { 
 	int sockfd, connfd; 
 	struct sockaddr_in servaddr, cli; 
@@ -133,11 +132,16 @@ int sockets()
 		printf("connection with the server failed...\n"); 
 		exit(0); 
 	} 
-	else{
+	else
 		printf("connected to the server..\n"); 
-    }
-    return sockfd;
+    printf("socckf");
+
+        // func(sockfd);
+
+        
     
+
+
 
 } 
 
@@ -163,7 +167,8 @@ int main(int argc, char*argv[])
         //FIFO
         if(modo==1){
             //manual
-            read_file();
+            // read_file();
+            sockets();
             return 0;
             
         }
