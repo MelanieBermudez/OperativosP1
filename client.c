@@ -6,27 +6,47 @@
 #define MAX 80 
 #define PORT 8080 
 #define SA struct sockaddr 
+#define MAXCHAR 1000
 
 void func(int sockfd) 
 { 
-	char buff[MAX]; 
-	int n; 
-	// for (int i =0; i<2;i++) { 
+	FILE *fp;
+	// char str[MAXCHAR];
+	char* filename= "procesos.txt";
+    int burst, prioridad;
+
+    // int res = sockets();
+    // enviar_msjcli(res);
+	fp = fopen(filename,"r");
+	if (fp==NULL){
+		printf("Could not open file %s", filename);
+		return 1;
+	}
+    char buff[MAX];
+	while(fgets(buff,MAXCHAR,fp)!=NULL){
+
+	
+		for (;;) { 
 		bzero(buff, sizeof(buff)); 
-		printf("Enter the string : "); 
-		n = 0; 
-		while ((buff[n++] = getchar()) != '\n') 
-			; 
-        buff[MAX]="esto es una pruena";
+		// printf("Enter the string : "); 
+		printf("leido    ",buff);
+        
 		write(sockfd, buff, sizeof(buff)); 
-		bzero(buff, sizeof(buff)); 
+		// bzero(buff, sizeof(buff)); 
 
 		read(sockfd, buff, sizeof(buff)); 
+
 		printf("From Server : %s", buff); 
-		if ((strncmp(buff, "exit", 4)) == 0) { 
-			printf("Client Exit...\n"); 
-			// break; 
-		} 
+
+	}
+        
+
+        sleep(5);
+        
+    }    
+
+	fclose(fp);
+
 	
 } 
 
