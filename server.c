@@ -24,9 +24,10 @@ void func(int sockfd)
 		printf("From client: %s\t To client : ", buff); 
 		bzero(buff, MAX); 
 		n = 0; 
+		char label[] = "Recibido ";
 		// copy server message in the buffer 
 		while ((buff[n++] = getchar()) != '\n'); 
-
+		
 		// and send that buffer to client 
 		write(sockfd, buff, sizeof(buff)); 
 
