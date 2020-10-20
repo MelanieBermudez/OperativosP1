@@ -13,28 +13,30 @@
 void func(int sockfd) 
 { 
 	char buff[MAX]; 
-	int n; 
+	char str1[MAX] = " Proceso recibido ";
+	int n,read_size; 
+	
 	// infinite loop for chat 
 	for (;;) { 
 		bzero(buff, MAX); 
-
 		// read the message from client and copy it in buffer 
 		read(sockfd, buff, sizeof(buff)); 
 		// print buffer which contains the client contents 
-		printf("From client: %s\t To client : ", buff); 
-		bzero(buff, MAX); 
+		printf("From client: %s ", buff); 
+		printf("\n To client: %s",str1);		
+		//bzero(buff, MAX); 
 		n = 0; 
+		
 		// copy server message in the buffer 
-		while ((buff[n++] = getchar()) != '\n') 
-			; 
-
-		// and send that buffer to client 
+		//while ((buff[n++] = getchar()) != '\n'); 
+		
 		write(sockfd, buff, sizeof(buff)); 
-
+		// and send that buffer to client 
+	
 		// if msg contains "Exit" then server exit and chat ended. 
 		if (strncmp("exit", buff, 4) == 0) { 
 			printf("Server Exit...\n"); 
-			break; 
+			// break; 
 		} 
 	} 
 } 
@@ -88,7 +90,10 @@ int main()
 
 	// Function for chatting between client and server 
 	func(connfd); 
+    
 
 	// After chatting close the socket 
-	close(sockfd); 
+	// close(sockfd); 
 } 
+
+
