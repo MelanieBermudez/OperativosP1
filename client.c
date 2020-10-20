@@ -24,25 +24,27 @@ void func(int sockfd)
 	if (fp==NULL){
 		printf("Could not open file %s", filename);
 	}
-	for (;;) { 
+
+	 
+		while(fgets(buff,MAXCHAR,fp)!= NULL){
+			printf("buff %s", buff);
+			// bzero(buff, sizeof(buff)); 
+		
+		// 	//esperar 2 segundos
+		sleep(2);
+
+		// 	//enviar informacion    
+		write(sockfd, buff, sizeof(buff)); 
 		bzero(buff, sizeof(buff)); 
-		while(fgets(buff,MAXCHAR,fp)!=NULL){
-			printf("%s", buff);
-			//esperar 2 segundos
-			sleep(2);
+			
+		read(sockfd, buff, sizeof(buff)); 
+		printf("\nFrom Server : %s", buff); 
 
-			//enviar informacion    
-			write(sockfd, buff, sizeof(buff)); 
-			bzero(buff, sizeof(buff)); 
-
-			read(sockfd, buff, sizeof(buff)); 
-			printf("From Server : %s", buff); 
-
-			//sleep(5)
-		} 
+		sleep(5);
+}
 		fclose(fp);    
 
-	}
+	
 	
 	
 } 
