@@ -9,33 +9,49 @@
 #define PORT 8080 
 #define SA struct sockaddr 
 
-// Function designed for chat between client and server. 
 void func(int sockfd) 
 { 
 	char buff[MAX]; 
-	int n; 
+	
+	bzero(buff, sizeof(buff)); 
+
 	// infinite loop for chat 
-	for (;;) { 
+	 for (;;) { 
 		bzero(buff, MAX); 
-
-		// read the message from client and copy it in buffer 
 		read(sockfd, buff, sizeof(buff)); 
-		// print buffer which contains the client contents 
-		printf("From client: %s\t To client : ", buff); 
+		puts(buff);
+		// printf("From client: %s\t To client : ", buff); 
+		char s[]="recibido\n";
+		
+		//hay que meterlo a la cola hilo
+		//un hilo haga lo de la cola
+		//y el otro lo del socket
+		
 
-		// bzero(buff, MAX); 
-		n = 0; 
-		// copy server message in the buffer 
-		// while ((buff[n++] = getchar()) != '\n') 
-		// 	; 
-		// buff[24]='recibivo';
-		char label[] = "Recibido ";
-		write(sockfd, label, sizeof(label)); 
-
-		// if msg contains "Exit" then server exit and chat ended. 
+		write(sockfd, s, sizeof(s)); 
+		
 
 	} 
 } 
+
+
+// void func(int sockfd) 
+// { 
+// 	char buff[MAX]; 
+// 	int n; 
+
+// 	bzero(buff, sizeof(buff)); 
+// 	printf("Enter the string : "); 
+// 	n = 0; 
+// 	while ((buff[n++] = getchar()) != '\n') 
+// 		; 
+// 	write(sockfd, buff, sizeof(buff)); 
+// 	bzero(buff, sizeof(buff)); 
+// 	read(sockfd, buff, sizeof(buff)); 
+// 	printf("From Server : %s", buff); 
+
+	
+// } 
 
 // Driver function 
 int main() 

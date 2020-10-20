@@ -18,6 +18,7 @@ int algoritmo,modo;
 #define PORT 8080 
 #define SA struct sockaddr 
 
+
 void * myturn(void * arg){
 
 	printf("my turn arg %s",arg);
@@ -75,7 +76,6 @@ int read_file(){
 	}
     
 	while(fgets(str,MAXCHAR,fp)!=NULL){
-		
         //crear hilo
         // pthread_t newthread;
 	    // pthread_create(&newthread,NULL,myturn,str);
@@ -84,26 +84,20 @@ int read_file(){
         //sleep(2);
 
         //enviar informacion 
-       
     
         // enviar_msjcli(res);
         // recibir_msjcli(res);
         
-
-        sleep(5);
+        //sleep(5);
         
     }    
 	fclose(fp);
-
 	return 0;
-
-    
 }
 
 void auto_file(){
     int pid,burst,prioridad;
-    
-
+	
 }
 
 
@@ -149,76 +143,27 @@ int main(int argc, char*argv[])
 
 {
     printf("---------- Menu de opciones ---------- ");
-    printf("\nSeleccione el algoritmo: ");
-    printf("\n 1. FIFO ");
-    printf("\n 2. SJF ");
-    printf("\n 3. HPF ");
-    printf("\n 4. ROUND ROBIN \n");
-
-	scanf("%d", &algoritmo);
 
     printf("\nSeleccione el modo: ");
     printf("\n 1. MANUAL ");
     printf("\n 2. AUTOMATICO \n");
 
     scanf("%d", &modo);
+	if(modo==1){
+		//manual
+		read_file();
+		return 0;
+		
+	}
+	else{
+		//automatico
+		int rango;
+		printf("\nIndique el rango de valores para los procesos : ");
+		scanf("%d", &rango);
 
-    if(algoritmo==1){
-        //FIFO
-        if(modo==1){
-            //manual
-            // read_file();
-            sockets();
-            return 0;
-            
-        }
-        else{
-            //automatico
-            auto_file();
-            return 0;
-        }
-    }
-    if(algoritmo==2){
-        //SJF
-        if(modo==1){
-            //manual
-            read_file();
-            return 0;
-        }
-        else{
-            //automatico
-            auto_file();
-            return 0;
-        }
-    }
-    if(algoritmo==3){
-        //HPF
-        if(modo==1){
-            //manual
-            read_file();
-            return 0;
-        }
-        else{
-            //automatico
-            auto_file();
-            return 0;
-        }
-    }
-    else{
-        //RR
-        if(modo==1){
-            //manual
-            read_file();
-            return 0;
-        }
-        else{
-            //automatico
-            auto_file();
-            return 0;
-        }
+		auto_file();
+		return 0;
+	}
 
-    }
     
-	
-
 }

@@ -11,6 +11,7 @@
 #define MAX 80 
 #define PORT 8080 
 #define SA struct sockaddr 
+int algoritmo;
 
 
 
@@ -29,7 +30,7 @@ void * cpu_scheduler_info(void * arg){
 }
 
 void recibir_msj(int n){
-	printf("recibir mensaje")
+	printf("recibir mensaje");
     char buff[80];
     read(n,buff,sizeof(buff));
     printf(buff);
@@ -117,10 +118,32 @@ void conectar()
 } 
 
 int main (int argc, char*argv[]){
+	printf("---------- Menu de opciones ---------- ");
+    printf("\nSeleccione el algoritmo: ");
+    printf("\n 1. FIFO ");
+    printf("\n 2. SJF ");
+    printf("\n 3. HPF ");
+    printf("\n 4. ROUND ROBIN \n");
+	printf("\n 5. Salir \n");
+	
+	scanf("%d", &algoritmo);
+	switch(algoritmo){
+			case 1:
+				//FCFS(P,n);
+				break;
+			case 2:
+				//SJF_P(P,n);
+				break;
+			case 3:
+				//SJF_NP(P,n);
+				break;
+			case 4:
+				//PRT_P(P,n);
+				break;
+			case 5: exit(0);
+		}
 
-    //aqui va a llegar un msj 
 
-    //recibimos el mensaje con job_sched y lo metemos a la cola []
 
 
     //job scheduler 
