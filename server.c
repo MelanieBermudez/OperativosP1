@@ -5,16 +5,66 @@
 #include <string.h> 
 #include <sys/socket.h> 
 #include <sys/types.h> 
+// #include <process.h>
 #define MAX 80 
 #define PORT 8080 
 #define SA struct sockaddr 
+ 
+int top=-1,stack[MAX];
+void push();
+void pop();
+void display();
+ 
+ 
+void push(char *val)
+{
+	// int val;
+		if(top==MAX-1)
+	{
+		printf("\nStack is full!!");
+	}
+	else
+	{
+		top=top+1;
+		stack[top]=&val;
+	}
+}
+ 
+void pop()
+{
+	if(top==-1)
+	{
+		printf("\nStack is empty!!");
+	}
+	else
+	{
+		printf("\nDeleted element is %d",stack[top]);
+		top=top-1;
+	}
+}
+ 
+void display()
+{
+	int i;
+	
+	if(top==-1)
+	{
+		printf("\nStack is empty!!");
+	}
+	else
+	{
+		printf("\nStack is...\n");
+		for(i=top;i>=0;--i)
+			printf("%d\n",stack[i]);
+	}
+}
+
 
 void func(int sockfd) 
 { 
 	char buff[MAX]; 
-	
 	bzero(buff, sizeof(buff)); 
-
+	
 	// infinite loop for chat 
 	 for (;;) { 
 		bzero(buff, MAX); 
@@ -24,9 +74,13 @@ void func(int sockfd)
 		char s[]="recibido\n";
 		
 		//hay que meterlo a la cola hilo
-		//un hilo haga lo de la cola
+		//un hilo haga lo de la cola	
 		//y el otro lo del socket
-		
+	
+		// push(buff);
+		top=top+1;
+		stack[top]=&buff;
+		display();
 
 		write(sockfd, s, sizeof(s)); 
 		
