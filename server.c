@@ -44,13 +44,10 @@ void pop()
 void display()
 {
 	int i;
-	
-	if(top==-1)
-	{
+	if(top==-1){
 		printf("\nStack is empty!!");
 	}
-	else
-	{
+	else{
 		printf("\nStack is...\n");
 		for(i=top;i>=0;--i)
 			printf("%d\n",stack[i]);
