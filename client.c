@@ -12,6 +12,13 @@
 #define MAXCHAR 1000
 int modo,flag,rangomin,rangomax,tasa;
 
+typedef struct {int*socketfd;char* buffer }SendThread;
+
+void * send_thread(void*args){
+	SendThread *actual_args = args;
+	printf("\n Actual args: %d \n",actual_args->socketfd);
+
+}
 void func(int sockfd, int modo,int rangomin,int rangomax,int tasa) 
 { 
 	if(modo==1){
@@ -29,18 +36,25 @@ void func(int sockfd, int modo,int rangomin,int rangomax,int tasa)
 		}
 			while(fgets(buff,MAXCHAR,fp)!= NULL){
 				printf("buff %s", buff);
-				// bzero(buff, sizeof(buff)); 
-			
-			// 	//esperar 2 segundos
-			sleep(2);
 
-			// 	//enviar informacion    
+			//crear hilo 
+			SendThread * args = malloc(sizeof *args);
+			args ->socketfd = &sockfd;
+			args ->buffer = &buff;
+			pthread_t thread_send;
+			pthread_create(&thread_send,NULL,send_thread, args);
+			pthread_join(thread_send,NULL);
+
+			sleep(2);
+			// 	//enviar informacion - esto va dentro de la funcion del hilo  
+			
 			write(sockfd, buff, sizeof(buff)); 
 			bzero(buff, sizeof(buff)); 
 				
 			read(sockfd, buff, sizeof(buff)); 
 			printf("\nFrom Server : %s \n", buff); 
-			
+			//pthread_exit(0);
+			///
 			sleep(sleep_rand);
 			}		
 			fclose(fp); 
@@ -100,6 +114,7 @@ char read_file(){
 	fclose(fp);
 	return str;
 }
+
 
 
 void* myThreadRead(void *arg){
