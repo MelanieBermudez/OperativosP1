@@ -21,7 +21,14 @@ void push(int *val);
 void pop();
 void display();
  
- 
+ typedef struct {
+int *pid;
+int *burst;
+int *priority;
+
+ }Proceso;
+
+
 void push(int *val)
 {	
 	// printf("el valor a insertar es: ");;
@@ -65,6 +72,7 @@ void display()
 void func(int sockfd) 
 { 
 	char buff[MAX]; 
+	char str;
 	char str1[MAX] = " Proceso recibido ";
 	int n,read_size; 
 	bzero(buff, sizeof(buff)); 
@@ -78,6 +86,10 @@ void func(int sockfd)
 		bzero(buff, MAX); 
 		read(sockfd, buff, sizeof(buff)); 
 		printf("\nBuffer: %s\n",buff);
+		puts(buff);
+
+		//crear pid y enviarlo junto con recibido
+		//meterlo en una lista del ready con PCB
 
 
 	// // push(buff);
@@ -86,7 +98,7 @@ void func(int sockfd)
 	// 	display();
 
 		
-		write(sockfd, buff, sizeof(buff)); 
+		write(sockfd, str1, sizeof(str1)); 
 	} 
 }
 
