@@ -10,7 +10,6 @@ typedef struct process{
 	int flag;
 }processes;
 
-
 void b_sort(processes temp[],int n)
 {
 	processes t;

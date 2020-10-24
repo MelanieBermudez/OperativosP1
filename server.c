@@ -5,17 +5,20 @@
 #include <string.h> 
 #include <sys/socket.h> 
 #include <sys/types.h> 
+
 #define MAX 80 
 #define PORT 8080 
 #define SA struct sockaddr 
+int cola;
 
 void func(int sockfd) 
 { 
 	char buff[MAX]; 
 	char str1[MAX] = " Proceso recibido ";
 	int n,read_size; 
-	
 	bzero(buff, sizeof(buff)); 
+
+	char cola[]={};
 
 	// infinite loop for chat 
 	 for (;;) { 
