@@ -75,23 +75,18 @@ void func(int sockfd)
 	 for (;;) { 
 		bzero(buff, MAX); 
 		read(sockfd, buff, sizeof(buff)); 
-		// print buffer which contains the client contents 
-		printf("From client: %s ", buff); 
-		printf("\n To client: %s",str1);		
-		//bzero(buff, MAX); 
-		n = 0; 
+		printf("\nBuffer: %s\n",buff);
+
+		//hilo que mete a la cola
+		pthread_create(&thread_read,NULL,myThreadRead,(int*) &sockfd);
+
+	//  push(buff);
+	// 	top=top+1;
+	// 	stack[top]=&buff;
+	// 	display();
+
 		
-		// copy server message in the buffer 
-		//while ((buff[n++] = getchar()) != '\n'); 
-		
-		write(sockfd, buff, sizeof(buff)); 
-		// and send that buffer to client 
-	
-		// if msg contains "Exit" then server exit and chat ended. 
-		if (strncmp("exit", buff, 4) == 0) { 
-			printf("Server Exit...\n"); 
-			// break; 
-		} 
+		write(sockfd, str1, sizeof(str1)); 
 	} 
 } 
 
