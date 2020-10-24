@@ -12,6 +12,43 @@
 #define MAXCHAR 1000
 int modo,flag,rangomin,rangomax,tasa;
 
+void func(int sockfd) 
+{ 
+	char buff[MAX]; 
+	int n; 
+	FILE *fp;
+	
+	char* filename= "procesos.txt";
+    int burst, prioridad;
+
+	fp = fopen(filename,"r");
+	if (fp==NULL){
+		printf("Could not open file %s", filename);
+	}
+
+	 
+		while(fgets(buff,MAXCHAR,fp)!= NULL){
+			printf("buff %s", buff);
+			// bzero(buff, sizeof(buff)); 
+		
+		// 	//esperar 2 segundos
+		sleep(2);
+
+		// 	//enviar informacion    
+		write(sockfd, buff, sizeof(buff)); 
+		bzero(buff, sizeof(buff)); 
+			
+		read(sockfd, buff, sizeof(buff)); 
+		printf("\nFrom Server : %s", buff); 
+
+		sleep(5);
+}
+		fclose(fp);    
+
+	
+	
+	
+} 
 
 void* myThreadRead(void *arg){
 	char buff[MAX]; 
@@ -107,7 +144,7 @@ int main()
 		printf("\nIndique la tasa de creacion de procesos : ");
 		scanf("%d", &tasa);
 
-		// func(sockfd,modo,rangomin,rangomax,tasa);
+		func(sockfd,modo,rangomin,rangomax,tasa);
 		return 0;
 	}
 	
