@@ -12,17 +12,35 @@
 #define MAXCHAR 1000
 int modo,flag,rangomin,rangomax,tasa;
 
-typedef struct {int*socketfd;char* buffer }SendThread;
+typedef struct {
+int *socketfd;
+char *buffer;
+char *msg[MAX];
+ }SendThread;
 
-void * send_thread(void*args){
+void *send_thread(void *args){
 	SendThread *actual_args = args;
-	printf("\n Actual args: %d \n",actual_args->socketfd);
+	char buff[MAX] = "PROCESO ENVIADO";
+	// free(actual_args);
+	int socckfd= *actual_args->socketfd;
+	char *str1 = actual_args->buffer;
+	
+
+
+
+	write(socckfd, str1, sizeof(str1)); 
+	
+	bzero(buff, sizeof( buff)); 				
+	read( socckfd,  buff, sizeof(buff)); 
+	printf("\nFrom Server : %s \n", buff); 
 
 }
 void func(int sockfd, int modo,int rangomin,int rangomax,int tasa) 
 { 
 	if(modo==1){
 		char buff[MAX]; 
+		char buffa[MAX] = "PROCESO ENVIADO";
+
 		int n; 
 		FILE *fp;
 		
@@ -35,27 +53,29 @@ void func(int sockfd, int modo,int rangomin,int rangomax,int tasa)
 			printf("Could not open file %s", filename);
 		}
 			while(fgets(buff,MAXCHAR,fp)!= NULL){
-				printf("buff %s", buff);
-
+			// printf("buff %s", buff);
 			//crear hilo 
 			SendThread * args = malloc(sizeof *args);
+			// printf("\nasd%d",&sockfd);
 			args ->socketfd = &sockfd;
+			// printf("\nsoc%d",args->socketfd);
 			args ->buffer = &buff;
 			pthread_t thread_send;
 			pthread_create(&thread_send,NULL,send_thread, args);
-			pthread_join(thread_send,NULL);
+			// free(args);
+			// pthread_join(thread_send,NULL);
 
 			sleep(2);
 			// 	//enviar informacion - esto va dentro de la funcion del hilo  
 			
-			write(sockfd, buff, sizeof(buff)); 
-			bzero(buff, sizeof(buff)); 
+			// write(*args->socketfd, args ->buffer, sizeof(args ->buffer)); 
+			// bzero(buff, sizeof(buff)); 
 				
-			read(sockfd, buff, sizeof(buff)); 
-			printf("\nFrom Server : %s \n", buff); 
+			// read(sockfd, buff, sizeof(buff)); 
+			// printf("\nFrom Server : %s \n", buff); 
 			//pthread_exit(0);
 			///
-			sleep(sleep_rand);
+			// sleep(sleep_rand);
 			}		
 			fclose(fp); 
 	}else{
@@ -192,13 +212,7 @@ int main()
     scanf("%d", &modo);
 	if(modo==1){
 
-		pthread_t thread_read;
-		pthread_t thread_queu;
-		pthread_create(&thread_read,NULL,myThreadRead,(int*) &sockfd);
-		// pthread_create(&thread_queu,NULL,myThreadQueu,(int*) &sockfd);
-		pthread_join(thread_read,NULL);
-		// pthread_join(thread_queu,NULL);
-
+		func(sockfd,modo,0,0,0);
 		// return 0;
 		
 	}
