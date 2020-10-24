@@ -5,6 +5,11 @@
 #include <string.h> 
 #include <sys/socket.h> 
 #include <sys/types.h> 
+
+#define MAX 80 
+#define PORT 8080 
+#define SA struct sockaddr 
+int cola;
 // #include <process.h>
 #define MAX 80 
 #define PORT 8080 
@@ -58,36 +63,35 @@ void display()
 void func(int sockfd) 
 { 
 	char buff[MAX]; 
+	char str1[MAX] = " Proceso recibido ";
+	int n,read_size; 
+	bzero(buff, sizeof(buff)); 
+
+	char cola[]={};
+
 	bzero(buff, sizeof(buff)); 
 	
 	// infinite loop for chat 
 	 for (;;) { 
 		bzero(buff, MAX); 
 		read(sockfd, buff, sizeof(buff)); 
-		puts(buff);
-		// printf("From client: %s\t To client : ", buff); 
-		char s[]="recibido\n";
+		// print buffer which contains the client contents 
+		printf("From client: %s ", buff); 
+		printf("\n To client: %s",str1);		
+		//bzero(buff, MAX); 
+		n = 0; 
 		
-		//hay que meterlo a la cola hilo
-		//un hilo haga lo de la cola	
-		//y el otro lo del socket
-	
-		// push(buff);
-		// top=top+1;
-		// stack[top] = &buff;
-		// int u=23;
-		// push(&u);
-		// display();
-		// // int i;
-		// for(i=top;i>=0;--i)
-		// 	printf("%d\n",&stack[i]);
-	
-		// puts(stack[top]);
-		// printf("%d\n",stack[0]);
-		// printf("%d\n",stack[1]);
-		write(sockfd, s, sizeof(s)); 
+		// copy server message in the buffer 
+		//while ((buff[n++] = getchar()) != '\n'); 
 		
-
+		write(sockfd, buff, sizeof(buff)); 
+		// and send that buffer to client 
+	
+		// if msg contains "Exit" then server exit and chat ended. 
+		if (strncmp("exit", buff, 4) == 0) { 
+			printf("Server Exit...\n"); 
+			// break; 
+		} 
 	} 
 } 
 
