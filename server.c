@@ -10,24 +10,22 @@
 #define PORT 8080 
 #define SA struct sockaddr 
  
-int top=-1,stack[MAX];
-void push();
+int top=-1;
+int stack[MAX];
+void push(int *val);
 void pop();
 void display();
  
  
-void push(char *val)
-{
-	// int val;
-		if(top==MAX-1)
-	{
-		printf("\nStack is full!!");
-	}
-	else
-	{
-		top=top+1;
-		stack[top]=&val;
-	}
+void push(int *val)
+{	
+	// printf("el valor a insertar es: ");;
+	// printf(&val);
+	// printf(*val);
+	printf("vlar %s ",&val);
+	top=top+1;
+	stack[top]=&val;
+
 }
  
 void pop()
@@ -78,10 +76,18 @@ void func(int sockfd)
 		//y el otro lo del socket
 	
 		// push(buff);
-		top=top+1;
-		stack[top]=&buff;
-		display();
-
+		// top=top+1;
+		// stack[top] = &buff;
+		// int u=23;
+		// push(&u);
+		// display();
+		// // int i;
+		// for(i=top;i>=0;--i)
+		// 	printf("%d\n",&stack[i]);
+	
+		// puts(stack[top]);
+		// printf("%d\n",stack[0]);
+		// printf("%d\n",stack[1]);
 		write(sockfd, s, sizeof(s)); 
 		
 

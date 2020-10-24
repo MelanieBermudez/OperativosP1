@@ -91,9 +91,9 @@ int main()
 		pthread_t thread_read;
 		pthread_t thread_queu;
 		pthread_create(&thread_read,NULL,myThreadRead,(int*) &sockfd);
-		pthread_create(&thread_queu,NULL,myThreadQueu,(int*) &sockfd);
+		// pthread_create(&thread_queu,NULL,myThreadQueu,(int*) &sockfd);
 		pthread_join(thread_read,NULL);
-		pthread_join(thread_queu,NULL);
+		// pthread_join(thread_queu,NULL);
 
 		// return 0;
 		
