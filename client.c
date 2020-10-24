@@ -107,7 +107,7 @@ int main()
 		printf("\nIndique la tasa de creacion de procesos : ");
 		scanf("%d", &tasa);
 
-		func(sockfd,modo,rangomin,rangomax,tasa);
+		// func(sockfd,modo,rangomin,rangomax,tasa);
 		return 0;
 	}
 	
