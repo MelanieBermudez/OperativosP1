@@ -8,43 +8,74 @@
 #define SA struct sockaddr 
 //Define para menu consola
 #define MAXCHAR 1000
-int modo,flag;
+int modo,flag,rangomin,rangomax,tasa;
 
 
-void func(int sockfd) 
+void func(int sockfd, int modo,int rangomin,int rangomax,int tasa) 
 { 
-	char buff[MAX]; 
-	int n; 
-	FILE *fp;
-	
-	char* filename= "procesos.txt";
-    int burst, prioridad;
+	if(modo==1){
+		char buff[MAX]; 
+		int n; 
+		FILE *fp;
+		
+		char* filename= "procesos.txt";
+		int burst, prioridad;
+		int sleep_rand = rand() % (8 + 1-3)+3;
 
-	fp = fopen(filename,"r");
-	if (fp==NULL){
-		printf("Could not open file %s", filename);
-	}
-	for (;;) { 
-		bzero(buff, sizeof(buff)); 
-		while(fgets(buff,MAXCHAR,fp)!=NULL){
-			printf("%s", buff);
-			//esperar 2 segundos
+		fp = fopen(filename,"r");
+		if (fp==NULL){
+			printf("Could not open file %s", filename);
+		}
+			while(fgets(buff,MAXCHAR,fp)!= NULL){
+				printf("buff %s", buff);
+				// bzero(buff, sizeof(buff)); 
+			
+			// 	//esperar 2 segundos
 			sleep(2);
 
-			//enviar informacion    
+			// 	//enviar informacion    
 			write(sockfd, buff, sizeof(buff)); 
 			bzero(buff, sizeof(buff)); 
-
+				
 			read(sockfd, buff, sizeof(buff)); 
-			printf("From Server : %s", buff); 
+			printf("\nFrom Server : %s \n", buff); 
+			
+			sleep(sleep_rand);
+			}		
+			fclose(fp); 
+	}else{
+		int pid=0;
+		int burst;
+		int prioridad;
+		char buff[MAX]; 
+		int n; 
 
-			//sleep(5)
-		} 
-		fclose(fp);    
+		
+		for(;;){
+			burst = rand() % (rangomax + 1-rangomin)+rangomin;
+			prioridad = rand() % (rangomax + 1-rangomin)+rangomin;
+			pid++;
+			printf("%PID %d\n",pid);
+			printf("%BURST %d\n",burst);
+			printf("%PRIORIDAD %d\n",prioridad);
+			sleep(2);
 
+			bzero(buff, sizeof(buff)); 
+			buff[0]=pid+'0';
+			buff[1]=' ';
+			buff[2]=burst+'0';
+			buff[3]=' ';
+			buff[4]=prioridad+'0';
+			buff[5]='\0';
+			write(sockfd, buff, sizeof(buff)); 
+			bzero(buff, sizeof(buff)); 
+				
+			read(sockfd, buff, sizeof(buff)); 
+			printf("\nFrom Server : %s\n", buff); 
+			sleep(tasa);
+		}
 	}
-	
-	
+
 } 
 
 char read_file(){
@@ -69,10 +100,6 @@ char read_file(){
 	return str;
 }
 
-void auto_file(){
-    int pid,burst,prioridad;
-	
-}
 
 int main() 
 { 
@@ -113,17 +140,20 @@ int main()
     scanf("%d", &modo);
 	if(modo==1){
 		//manual
-		func(sockfd);
+		func(sockfd,modo,0,0,0);
 		return 0;
 		
 	}
 	else{
 		//automatico
-		int rango;
-		printf("\nIndique el rango de valores para los procesos : ");
-		scanf("%d", &rango);
+		printf("\nIndique el rango minimo: ");
+		scanf("%d", &rangomin);
+		printf("\nIndique el rango maximo: ");
+		scanf("%d", &rangomax);
+		printf("\nIndique la tasa de creacion de procesos : ");
+		scanf("%d", &tasa);
 
-		auto_file();
+		func(sockfd,modo,rangomin,rangomax,tasa);
 		return 0;
 	}
 	

@@ -5,21 +5,24 @@
 #include <string.h> 
 #include <sys/socket.h> 
 #include <sys/types.h> 
+
 #define MAX 80 
 #define PORT 8080 
 #define SA struct sockaddr 
+int cola;
 
-// Function designed for chat between client and server. 
 void func(int sockfd) 
 { 
 	char buff[MAX]; 
 	char str1[MAX] = " Proceso recibido ";
 	int n,read_size; 
-	
+	bzero(buff, sizeof(buff)); 
+
+	char cola[]={};
+
 	// infinite loop for chat 
-	for (;;) { 
+	 for (;;) { 
 		bzero(buff, MAX); 
-		// read the message from client and copy it in buffer 
 		read(sockfd, buff, sizeof(buff)); 
 		// print buffer which contains the client contents 
 		printf("From client: %s ", buff); 
@@ -40,6 +43,25 @@ void func(int sockfd)
 		} 
 	} 
 } 
+
+
+// void func(int sockfd) 
+// { 
+// 	char buff[MAX]; 
+// 	int n; 
+
+// 	bzero(buff, sizeof(buff)); 
+// 	printf("Enter the string : "); 
+// 	n = 0; 
+// 	while ((buff[n++] = getchar()) != '\n') 
+// 		; 
+// 	write(sockfd, buff, sizeof(buff)); 
+// 	bzero(buff, sizeof(buff)); 
+// 	read(sockfd, buff, sizeof(buff)); 
+// 	printf("From Server : %s", buff); 
+
+	
+// } 
 
 // Driver function 
 int main() 
