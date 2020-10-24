@@ -12,43 +12,95 @@
 #define MAXCHAR 1000
 int modo,flag,rangomin,rangomax,tasa;
 
-void func(int sockfd) 
+void func(int sockfd, int modo,int rangomin,int rangomax,int tasa) 
 { 
-	char buff[MAX]; 
-	int n; 
-	FILE *fp;
-	
+	if(modo==1){
+		char buff[MAX]; 
+		int n; 
+		FILE *fp;
+		
+		char* filename= "procesos.txt";
+		int burst, prioridad;
+		int sleep_rand = rand() % (8 + 1-3)+3;
+
+		fp = fopen(filename,"r");
+		if (fp==NULL){
+			printf("Could not open file %s", filename);
+		}
+			while(fgets(buff,MAXCHAR,fp)!= NULL){
+				printf("buff %s", buff);
+				// bzero(buff, sizeof(buff)); 
+			
+			// 	//esperar 2 segundos
+			sleep(2);
+
+			// 	//enviar informacion    
+			write(sockfd, buff, sizeof(buff)); 
+			bzero(buff, sizeof(buff)); 
+				
+			read(sockfd, buff, sizeof(buff)); 
+			printf("\nFrom Server : %s \n", buff); 
+			
+			sleep(sleep_rand);
+			}		
+			fclose(fp); 
+	}else{
+		int pid=0;
+		int burst;
+		int prioridad;
+		char buff[MAX]; 
+		int n; 
+
+		
+		for(;;){
+			burst = rand() % (rangomax + 1-rangomin)+rangomin;
+			prioridad = rand() % (rangomax + 1-rangomin)+rangomin;
+			pid++;
+			printf("%PID %d\n",pid);
+			printf("%BURST %d\n",burst);
+			printf("%PRIORIDAD %d\n",prioridad);
+			sleep(2);
+
+			bzero(buff, sizeof(buff)); 
+			buff[0]=pid+'0';
+			buff[1]=' ';
+			buff[2]=burst+'0';
+			buff[3]=' ';
+			buff[4]=prioridad+'0';
+			buff[5]='\0';
+			write(sockfd, buff, sizeof(buff)); 
+			bzero(buff, sizeof(buff)); 
+				
+			read(sockfd, buff, sizeof(buff)); 
+			printf("\nFrom Server : %s\n", buff); 
+			sleep(tasa);
+		}
+	}
+
+}
+
+char read_file(){
+    FILE *fp;
+	char str[MAXCHAR];
 	char* filename= "procesos.txt";
     int burst, prioridad;
 
 	fp = fopen(filename,"r");
 	if (fp==NULL){
 		printf("Could not open file %s", filename);
+		return 1;
 	}
-
-	 
-		while(fgets(buff,MAXCHAR,fp)!= NULL){
-			printf("buff %s", buff);
-			// bzero(buff, sizeof(buff)); 
-		
-		// 	//esperar 2 segundos
-		sleep(2);
-
-		// 	//enviar informacion    
-		write(sockfd, buff, sizeof(buff)); 
-		bzero(buff, sizeof(buff)); 
-			
-		read(sockfd, buff, sizeof(buff)); 
-		printf("\nFrom Server : %s", buff); 
-
-		sleep(5);
+	while(fgets(str,MAXCHAR,fp)!=NULL){
+		printf("%s", str);
+        //esperar 2 segundos
+        sleep(2);
+        //enviar informacion    
+        //sleep(5)
+    }    
+	fclose(fp);
+	return str;
 }
-		fclose(fp);    
 
-	
-	
-	
-} 
 
 void* myThreadRead(void *arg){
 	char buff[MAX]; 
