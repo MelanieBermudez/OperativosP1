@@ -10,6 +10,58 @@
 #define PORT 8080 
 #define SA struct sockaddr 
 int cola;
+// #include <process.h>
+#define MAX 80 
+#define PORT 8080 
+#define SA struct sockaddr 
+ 
+int top=-1;
+int stack[MAX];
+void push(int *val);
+void pop();
+void display();
+ 
+ 
+void push(int *val)
+{	
+	// printf("el valor a insertar es: ");;
+	// printf(&val);
+	// printf(*val);
+	printf("vlar %s ",&val);
+	top=top+1;
+	stack[top]=&val;
+
+}
+ 
+void pop()
+{
+	if(top==-1)
+	{
+		printf("\nStack is empty!!");
+	}
+	else
+	{
+		printf("\nDeleted element is %d",stack[top]);
+		top=top-1;
+	}
+}
+ 
+void display()
+{
+	int i;
+	
+	if(top==-1)
+	{
+		printf("\nStack is empty!!");
+	}
+	else
+	{
+		printf("\nStack is...\n");
+		for(i=top;i>=0;--i)
+			printf("%d\n",stack[i]);
+	}
+}
+
 
 void func(int sockfd) 
 { 
@@ -20,6 +72,8 @@ void func(int sockfd)
 
 	char cola[]={};
 
+	bzero(buff, sizeof(buff)); 
+	
 	// infinite loop for chat 
 	 for (;;) { 
 		bzero(buff, MAX); 
