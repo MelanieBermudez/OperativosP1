@@ -24,17 +24,27 @@ void *send_thread(void *args){
 	// free(actual_args);
 	int socckfd= *actual_args->socketfd;
 	char *str1 = actual_args->buffer;
+	sleep(2);
 
-	write(socckfd, str1, sizeof(str1)); 
+	// if (buff== ' '){
+	// 	printf('buff');
+
+	// }else{
+
+		printf("\nto Server : %s \n", str1); 
+		write(socckfd, str1, sizeof(str1)); 
+		bzero(buff, sizeof( buff)); 				
+		read( socckfd,  buff, sizeof(buff)); 
+		printf("\nFrom Server : %s \n", buff); 
+
+		pthread_exit(0);
+		
 	
-	bzero(buff, sizeof( buff)); 				
-	read( socckfd,  buff, sizeof(buff)); 
-	printf("\nFrom Server : %s \n", buff); 
-
 }
 void func(int sockfd, int modo,int rangomin,int rangomax,int tasa) 
 { 
-	if(modo==1){
+	int sleep_rand = rand() % (8 + 1-3)+3;
+	if(modo==1) {
 		char buff[MAX]; 
 		char buffa[MAX] = "PROCESO ENVIADO";
 
@@ -43,36 +53,22 @@ void func(int sockfd, int modo,int rangomin,int rangomax,int tasa)
 		
 		char* filename= "procesos.txt";
 		int burst, prioridad;
-		int sleep_rand = rand() % (8 + 1-3)+3;
+	
 
 		fp = fopen(filename,"r");
 		if (fp==NULL){
 			printf("Could not open file %s", filename);
 		}
 			while(fgets(buff,MAXCHAR,fp)!= NULL){
-			// printf("buff %s", buff);
-			//crear hilo 
+
 			SendThread * args = malloc(sizeof *args);
-			// printf("\nasd%d",&sockfd);
 			args ->socketfd = &sockfd;
-			// printf("\nsoc%d",args->socketfd);
 			args ->buffer = &buff;
 			pthread_t thread_send;
 			pthread_create(&thread_send,NULL,send_thread, args);
-			// free(args);
-			// pthread_join(thread_send,NULL);
-
-			sleep(2);
-			// 	//enviar informacion - esto va dentro de la funcion del hilo  
-			
-			// write(*args->socketfd, args ->buffer, sizeof(args ->buffer)); 
-			// bzero(buff, sizeof(buff)); 
-				
-			// read(sockfd, buff, sizeof(buff)); 
-			// printf("\nFrom Server : %s \n", buff); 
-			//pthread_exit(0);
-			///
 			// sleep(sleep_rand);
+			sleep(1);
+			pthread_join(thread_send,NULL);
 			}		
 			fclose(fp); 
 	}else{
