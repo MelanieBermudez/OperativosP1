@@ -2,6 +2,7 @@
 #include <netdb.h> 
 #include <netinet/in.h> 
 #include <stdlib.h> 
+#include <math.h>
 #include <string.h> 
 #include <sys/socket.h> 
 #include <sys/types.h> 
@@ -81,9 +82,12 @@ void func(int sockfd)
 	// infinite loop for chat 
 	 for (;;) { 
 		bzero(buff, MAX); 
-		read(sockfd, buff, sizeof(buff)); 
-		printf("\nBuffer: %s\n",buff);
+		read(sockfd, buff, sizeof(buff));
+	
 		puts(buff);
+
+
+
 
 		//crear pid y enviarlo junto con recibido
 		//meterlo en una lista del ready con PCB
@@ -117,6 +121,41 @@ void func(int sockfd)
 
 	
 // } 
+
+void *job_scheduler(void * sockfd){
+
+	
+	char buff[MAX]; 
+	char str;
+	int pid=1;
+	char str1[MAX] = " Proceso recibido ";
+	int n,read_size; 
+
+	printf("socckd %d ",sockfd);
+	char cola[]={};
+// 
+	bzero(buff, sizeof(buff)); 
+	
+//	infinite loop for chat 
+	 for (;;) { 
+		bzero(buff, MAX); 
+		read(sockfd, buff, sizeof(buff)); 
+		if(buff != NULL){
+		printf("\nBuffer: %s\n",buff);
+		}
+		char str[MAX];
+		//crear pid y enviarlo junto con recibido
+		//meterlo en una lista del ready con PCB
+		printf("pid%d",pid);
+		pid++;
+		// itoa(pid,str,10);
+		sprintf(str, "%d", pid);
+		printf("str:  %s",str);
+		write(sockfd, str1, sizeof(str1)); 
+	} 
+}
+
+
 
 // Driver function 
 int main() 
@@ -166,8 +205,17 @@ int main()
 		printf("server acccept the client...\n"); 
 
 	// Function for chatting between client and server 
-	func(connfd); 
-    
+	// func(connfd); 
+	
+	printf("asdsdas %d ",&connfd);
+
+	pthread_t job_scheduler_thread;
+	
+	pthread_create(&job_scheduler_thread,NULL, job_scheduler,(int *) connfd);
+    pthread_join(job_scheduler_thread,NULL);
+
+
+
 
 	// After chatting close the socket 
 	// close(sockfd); 

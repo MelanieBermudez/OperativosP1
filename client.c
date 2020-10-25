@@ -24,9 +24,6 @@ void *send_thread(void *args){
 	// free(actual_args);
 	int socckfd= *actual_args->socketfd;
 	char *str1 = actual_args->buffer;
-	
-
-
 
 	write(socckfd, str1, sizeof(str1)); 
 	
