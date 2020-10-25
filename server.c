@@ -127,31 +127,68 @@ void *job_scheduler(void * sockfd){
 	
 	char buff[MAX]; 
 	char str;
-	int pid=1;
-	char str1[MAX] = " Proceso recibido ";
+	int pid=0;
+	char respuesta[MAX] = " Proceso recibido. PID: ";
 	int n,read_size; 
 
-	printf("socckd %d ",sockfd);
 	char cola[]={};
 // 
 	bzero(buff, sizeof(buff)); 
 	
 //	infinite loop for chat 
-	 for (;;) { 
+	 for (int i=0; i<=4;i++) {
+
+		char respuesta[MAX] = " Proceso recibido. PID: ";
 		bzero(buff, MAX); 
 		read(sockfd, buff, sizeof(buff)); 
-		if(buff != NULL){
-		printf("\nBuffer: %s\n",buff);
-		}
 		char str[MAX];
-		//crear pid y enviarlo junto con recibido
-		//meterlo en una lista del ready con PCB
-		printf("pid%d",pid);
-		pid++;
-		// itoa(pid,str,10);
-		sprintf(str, "%d", pid);
-		printf("str:  %s",str);
-		write(sockfd, str1, sizeof(str1)); 
+
+		printf("budd %s\n", buff);
+		char *temp = strtok(buff," ");		
+		// if(strlen(buff)==0){
+
+		printf("te,p %s\n", temp);
+		if(*temp == '0'){
+			char respuesta1[MAX] = " Finalizado ";		
+			printf("%s",respuesta);
+			write(sockfd, respuesta1, sizeof(respuesta1)); 
+			close(sockfd); 
+		}
+		else{
+			printf("adneto %s\n", buff);
+			// char *char_burst = strtok(buff," ");
+			char *char_priority = strtok(NULL," ");
+			int int_burst=0;
+			int int_priority=0;
+			// int_burst =	 *char_burst - '0';
+			int_burst =	 *temp - '0';
+			int_priority = *char_priority - '0';
+
+			//crear pid y enviarlo junto con recibido
+			//meterlo en una lista del ready con PCB
+			Proceso *temp_proccess = malloc(sizeof * temp_proccess);
+
+			pid++;
+			str[0]= pid+'0';
+			strcat(respuesta,str);
+			bzero(str, sizeof(str)); 
+			write(sockfd, respuesta, sizeof(respuesta)); 
+			bzero(respuesta, sizeof(respuesta)); 
+
+
+			temp_proccess->pid= &pid;
+			temp_proccess->burst= &int_burst;
+			temp_proccess->priority= &int_priority;
+
+			printf("ID %d\n",*temp_proccess->pid);
+			// printf("BURST %d\n",*temp_proccess->burst);
+			// printf("priority %d\n",*temp_proccess->priority);
+	
+		// else{
+		}
+		 
+			// pthread_exit(0);
+		
 	} 
 }
 
@@ -207,7 +244,6 @@ int main()
 	// Function for chatting between client and server 
 	// func(connfd); 
 	
-	printf("asdsdas %d ",&connfd);
 
 	pthread_t job_scheduler_thread;
 	
