@@ -6,6 +6,7 @@
 #include <string.h> 
 #include <sys/socket.h> 
 #include <sys/types.h> 
+#include <stdbool.h>
 
 #define MAX 80 
 #define PORT 8080 
@@ -15,56 +16,65 @@ int cola;
 #define MAX 80 
 #define PORT 8080 
 #define SA struct sockaddr 
- 
-int top=-1;
+
 int stack[MAX];
-void push(int *val);
-void pop();
-void display();
  
- typedef struct {
-int *pid;
-int *burst;
-int *priority;
+ typedef struct proceso {
+int pid;
+int burst;
+int priority;
+struct proceso *anterior;
 
- }Proceso;
+ }*proceso_ptr;
 
+proceso_ptr front = NULL;
+proceso_ptr rear = NULL;
 
-void push(int *val)
-{	
-	// printf("el valor a insertar es: ");;
-	// printf(&val);
-	// printf(*val);
-	printf("vlar %s ",&val);
-	top=top+1;
-	stack[top]=&val;
+bool is_empty(){
 
+	return (front == NULL);
 }
- 
-void pop()
+
+void push(struct proceso p)
 {
-	if(top==-1)
-	{
-		printf("\nStack is empty!!");
-	}
-	else
-	{
-		printf("\nDeleted element is %d",stack[top]);
-		top=top-1;
-	}
-}
- 
-void display()
-{
-	int i;
-	if(top==-1){
-		printf("\nStack is empty!!");
-	}
+	printf("Push: %d, %d, %d", p.pid, p.burst,p.priority);
+	proceso_ptr item = (proceso_ptr) malloc(sizeof(struct proceso));
+	item->pid=p.pid;
+	item->burst=p.burst;
+	item->priority=p.priority;
+	if(rear == NULL)
+		front = rear = item;
 	else{
-		printf("\nStack is...\n");
-		for(i=top;i>=0;--i)
-			printf("%d\n",stack[i]);
+		rear->anterior = item;
+		rear = item;
 	}
+}
+ 
+proceso_ptr pop()
+{
+	proceso_ptr temp = front;
+	front = front->anterior;
+	return temp;
+
+}
+ 
+void display(){
+
+	if(is_empty()){
+
+		printf("\nThe queue is empty!\n");
+		return;
+	}
+	proceso_ptr temp = front;
+	printf("\n[front -> ");
+
+	while(temp != NULL){
+		//printf("- [%d], [%d], [%d] -", temp->pid,temp->burst,temp->priority);
+		printf("[%d]", temp->pid);
+		temp = temp->anterior;
+	}
+	printf(" <- rear]\n");
+
 }
 
 void func(int sockfd) 
@@ -85,46 +95,14 @@ void func(int sockfd)
 		read(sockfd, buff, sizeof(buff));
 	
 		puts(buff);
-
-
-
-
-		//crear pid y enviarlo junto con recibido
-		//meterlo en una lista del ready con PCB
-
-
-	// // push(buff);
-	// 	top=top+1;
-	// 	stack[top]=&buff;
-	// 	display();
-
 		
 		write(sockfd, str1, sizeof(str1)); 
 	} 
 }
 
 
-// void func(int sockfd) 
-// { 
-// 	char buff[MAX]; 
-// 	int n; 
-
-// 	bzero(buff, sizeof(buff)); 
-// 	printf("Enter the string : "); 
-// 	n = 0; 
-// 	while ((buff[n++] = getchar()) != '\n') 
-// 		; 
-// 	write(sockfd, buff, sizeof(buff)); 
-// 	bzero(buff, sizeof(buff)); 
-// 	read(sockfd, buff, sizeof(buff)); 
-// 	printf("From Server : %s", buff); 
-
-	
-// } 
-
 void *job_scheduler(void * sockfd){
 
-	
 	char buff[MAX]; 
 	char str;
 	int pid=0;
@@ -136,26 +114,26 @@ void *job_scheduler(void * sockfd){
 	bzero(buff, sizeof(buff)); 
 	
 //	infinite loop for chat 
-	 for (int i=0; i<=4;i++) {
+	 for (;;) {
 
 		char respuesta[MAX] = " Proceso recibido. PID: ";
 		bzero(buff, MAX); 
 		read(sockfd, buff, sizeof(buff)); 
 		char str[MAX];
 
-		printf("budd %s\n", buff);
+		// printf("budd %s\n", buff);
 		char *temp = strtok(buff," ");		
 		// if(strlen(buff)==0){
-
-		printf("te,p %s\n", temp);
-		if(*temp == '0'){
+		printf("temp %s\n", temp);
+		if(strlen(buff)==0){
 			char respuesta1[MAX] = " Finalizado ";		
-			printf("%s",respuesta);
 			write(sockfd, respuesta1, sizeof(respuesta1)); 
+			bzero(buff, MAX); 
+			pthread_exit();
 			close(sockfd); 
 		}
 		else{
-			printf("adneto %s\n", buff);
+			printf("adentro %s\n", buff);
 			// char *char_burst = strtok(buff," ");
 			char *char_priority = strtok(NULL," ");
 			int int_burst=0;
@@ -166,8 +144,7 @@ void *job_scheduler(void * sockfd){
 
 			//crear pid y enviarlo junto con recibido
 			//meterlo en una lista del ready con PCB
-			Proceso *temp_proccess = malloc(sizeof * temp_proccess);
-
+			proceso_ptr temp_proccess = (proceso_ptr) malloc(sizeof (struct proceso));
 			pid++;
 			str[0]= pid+'0';
 			strcat(respuesta,str);
@@ -175,25 +152,21 @@ void *job_scheduler(void * sockfd){
 			write(sockfd, respuesta, sizeof(respuesta)); 
 			bzero(respuesta, sizeof(respuesta)); 
 
+			temp_proccess->pid= pid;
+			temp_proccess->burst= int_burst;
+			temp_proccess->priority= int_priority;
+			temp_proccess->anterior= NULL;
+			push(*temp_proccess);
 
-			temp_proccess->pid= &pid;
-			temp_proccess->burst= &int_burst;
-			temp_proccess->priority= &int_priority;
-
-			printf("ID %d\n",*temp_proccess->pid);
-			// printf("BURST %d\n",*temp_proccess->burst);
-			// printf("priority %d\n",*temp_proccess->priority);
-	
-		// else{
 		}
+		//NO BORRAR : CODIGO DE POP
+		// proceso_ptr temp_proccess2 = (proceso_ptr) malloc(sizeof (struct proceso));
+		// temp_proccess2= pop();
+		// printf("POP: %d", temp_proccess2->pid);	
 		 
 			// pthread_exit(0);
-		
 	} 
 }
-
-
-
 // Driver function 
 int main() 
 { 
@@ -241,17 +214,12 @@ int main()
 	else
 		printf("server acccept the client...\n"); 
 
-	// Function for chatting between client and server 
-	// func(connfd); 
-	
-
 	pthread_t job_scheduler_thread;
 	
 	pthread_create(&job_scheduler_thread,NULL, job_scheduler,(int *) connfd);
     pthread_join(job_scheduler_thread,NULL);
 
-
-
+	display();
 
 	// After chatting close the socket 
 	// close(sockfd); 
