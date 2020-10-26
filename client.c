@@ -4,6 +4,7 @@
 #include <string.h> 
 #include <sys/socket.h> 
 #include <pthread.h>
+#include <sys/types.h>
 
 #define MAX 80 
 #define PORT 8080 
@@ -26,19 +27,12 @@ void *send_thread(void *args){
 	char *str1 = actual_args->buffer;
 	sleep(2);
 
-	// if (buff== ' '){
-	// 	printf('buff');
-
-	// }else{
-
-		printf("\nto Server : %s \n", str1); 
-		write(socckfd, str1, sizeof(str1)); 
-		bzero(buff, sizeof( buff)); 				
-		read( socckfd,  buff, sizeof(buff)); 
-		printf("\nFrom Server : %s \n", buff); 
-
-		pthread_exit(0);
-		
+	printf("\nto Server : %s \n", str1); 
+	write(socckfd, str1, sizeof(str1)); 
+	bzero(buff, sizeof( buff)); 				
+	read( socckfd,  buff, sizeof(buff)); 
+	printf("\nFrom Server : %s \n", buff); 
+	pthread_exit(0);	
 	
 }
 void func(int sockfd, int modo,int rangomin,int rangomax,int tasa) 
@@ -54,7 +48,6 @@ void func(int sockfd, int modo,int rangomin,int rangomax,int tasa)
 		char* filename= "procesos.txt";
 		int burst, prioridad;
 	
-
 		fp = fopen(filename,"r");
 		if (fp==NULL){
 			printf("Could not open file %s", filename);
@@ -67,18 +60,20 @@ void func(int sockfd, int modo,int rangomin,int rangomax,int tasa)
 			pthread_t thread_send;
 			pthread_create(&thread_send,NULL,send_thread, args);
 			// sleep(sleep_rand);
-			sleep(1);
+			sleep(3);
 			pthread_join(thread_send,NULL);
+			int pthread_cancel(pthread_t thread_send);
+			
 			}		
 			fclose(fp); 
-	}else{
+	}
+	else{
 		int pid=0;
 		int burst;
 		int prioridad;
 		char buff[MAX]; 
 		int n; 
 
-		
 		for(;;){
 			burst = rand() % (rangomax + 1-rangomin)+rangomin;
 			prioridad = rand() % (rangomax + 1-rangomin)+rangomin;
@@ -103,32 +98,7 @@ void func(int sockfd, int modo,int rangomin,int rangomax,int tasa)
 			sleep(tasa);
 		}
 	}
-
 }
-
-char read_file(){
-    FILE *fp;
-	char str[MAXCHAR];
-	char* filename= "procesos.txt";
-    int burst, prioridad;
-
-	fp = fopen(filename,"r");
-	if (fp==NULL){
-		printf("Could not open file %s", filename);
-		return 1;
-	}
-	while(fgets(str,MAXCHAR,fp)!=NULL){
-		printf("%s", str);
-        //esperar 2 segundos
-        sleep(2);
-        //enviar informacion    
-        //sleep(5)
-    }    
-	fclose(fp);
-	return str;
-}
-
-
 
 void* myThreadRead(void *arg){
 	char buff[MAX]; 
@@ -197,17 +167,13 @@ int main()
 	}
 	
 	printf("---------- Menu de opciones ---------- ");
-
     printf("\nSeleccione el modo: ");
     printf("\n 1. MANUAL ");
     printf("\n 2. AUTOMATICO \n");
 
     scanf("%d", &modo);
 	if(modo==1){
-
 		func(sockfd,modo,0,0,0);
-		// return 0;
-		
 	}
 	else{
 		//automatico
