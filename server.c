@@ -124,6 +124,10 @@ void func(int sockfd)
 
 void *job_scheduler(void * sockfd){
 
+
+	Proceso P[MAX];
+
+
 	
 	char buff[MAX]; 
 	char str;
@@ -136,7 +140,7 @@ void *job_scheduler(void * sockfd){
 	bzero(buff, sizeof(buff)); 
 	
 //	infinite loop for chat 
-	 for (int i=0; i<=4;i++) {
+	 for (;;) {
 
 		char respuesta[MAX] = " Proceso recibido. PID: ";
 		bzero(buff, MAX); 
@@ -144,48 +148,50 @@ void *job_scheduler(void * sockfd){
 		char str[MAX];
 
 		printf("budd %s\n", buff);
-		char *temp = strtok(buff," ");		
+		// char *temp = strtok(buff," ");		
 		// if(strlen(buff)==0){
 
-		printf("te,p %s\n", temp);
-		if(*temp == '0'){
-			char respuesta1[MAX] = " Finalizado ";		
-			printf("%s",respuesta);
-			write(sockfd, respuesta1, sizeof(respuesta1)); 
-			close(sockfd); 
-		}
-		else{
-			printf("adneto %s\n", buff);
-			// char *char_burst = strtok(buff," ");
-			char *char_priority = strtok(NULL," ");
-			int int_burst=0;
-			int int_priority=0;
-			// int_burst =	 *char_burst - '0';
-			int_burst =	 *temp - '0';
-			int_priority = *char_priority - '0';
-
-			//crear pid y enviarlo junto con recibido
-			//meterlo en una lista del ready con PCB
-			Proceso *temp_proccess = malloc(sizeof * temp_proccess);
-
-			pid++;
-			str[0]= pid+'0';
-			strcat(respuesta,str);
-			bzero(str, sizeof(str)); 
-			write(sockfd, respuesta, sizeof(respuesta)); 
-			bzero(respuesta, sizeof(respuesta)); 
-
-
-			temp_proccess->pid= &pid;
-			temp_proccess->burst= &int_burst;
-			temp_proccess->priority= &int_priority;
-
-			printf("ID %d\n",*temp_proccess->pid);
-			// printf("BURST %d\n",*temp_proccess->burst);
-			// printf("priority %d\n",*temp_proccess->priority);
-	
+		// printf("te,p %s\n", temp);
+		// if(*temp == '0'){
+		// 	char respuesta1[MAX] = " Finalizado ";		
+		// 	printf("%s",respuesta);
+		// 	write(sockfd, respuesta1, sizeof(respuesta1)); 
+		// 	// close(sockfd); 
+		// }
 		// else{
-		}
+			// if (strlen(buff) != 0){
+
+				
+				printf("adentro %d\n", strlen(buff));
+				char *char_burst = strtok(buff," ");
+				char *char_priority = strtok(NULL," ");
+				int int_burst=0;
+				int int_priority=0;
+				int_burst =	 *char_burst - '0';
+				int_priority = *char_priority - '0';
+
+				//crear pid y enviarlo junto con recibido
+				//meterlo en una lista del ready con PCB
+				Proceso *temp_proccess = malloc(sizeof * temp_proccess);
+
+				pid++;
+				str[0]= pid+'0';
+				strcat(respuesta,str);
+				bzero(str, sizeof(str)); 
+				write(sockfd, respuesta, sizeof(respuesta)); 
+				bzero(respuesta, sizeof(respuesta)); 
+
+
+				temp_proccess->pid= &pid;
+				temp_proccess->burst= &int_burst;
+				temp_proccess->priority= &int_priority;
+
+				printf("ID %d\n",*temp_proccess->pid);
+				// printf("BURST %d\n",*temp_proccess->burst);
+				// printf("priority %d\n",*temp_proccess->priority);
+			// }
+		// else{
+		// }
 		 
 			// pthread_exit(0);
 		
@@ -197,6 +203,7 @@ void *job_scheduler(void * sockfd){
 // Driver function 
 int main() 
 { 
+	
 	int sockfd, connfd, len; 
 	struct sockaddr_in servaddr, cli; 
 
