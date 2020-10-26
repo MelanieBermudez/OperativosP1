@@ -37,7 +37,7 @@ bool is_empty(){
 
 void push(struct proceso p)
 {
-	printf("Push: %d, %d, %d", p.pid, p.burst,p.priority);
+	//printf("Push: %d, %d, %d", p.pid, p.burst,p.priority);
 	proceso_ptr item = (proceso_ptr) malloc(sizeof(struct proceso));
 	item->pid=p.pid;
 	item->burst=p.burst;
@@ -121,10 +121,9 @@ void *job_scheduler(void * sockfd){
 		read(sockfd, buff, sizeof(buff)); 
 		char str[MAX];
 
-		// printf("budd %s\n", buff);
+		printf("servidor recibe:  %s\n", buff);
 		char *temp = strtok(buff," ");		
 		// if(strlen(buff)==0){
-		printf("temp %s\n", temp);
 		if(strlen(buff)==0){
 			char respuesta1[MAX] = " Finalizado ";		
 			write(sockfd, respuesta1, sizeof(respuesta1)); 
@@ -133,7 +132,6 @@ void *job_scheduler(void * sockfd){
 			close(sockfd); 
 		}
 		else{
-			printf("adentro %s\n", buff);
 			// char *char_burst = strtok(buff," ");
 			char *char_priority = strtok(NULL," ");
 			int int_burst=0;

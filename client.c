@@ -32,7 +32,6 @@ void *send_thread(void *args){
 	bzero(buff, sizeof( buff)); 				
 	read( socckfd,  buff, sizeof(buff)); 
 	printf("\nFrom Server : %s \n", buff); 
-
 	pthread_exit(0);	
 	
 }
@@ -168,7 +167,6 @@ int main()
 	}
 	
 	printf("---------- Menu de opciones ---------- ");
-
     printf("\nSeleccione el modo: ");
     printf("\n 1. MANUAL ");
     printf("\n 2. AUTOMATICO \n");
