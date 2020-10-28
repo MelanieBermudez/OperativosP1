@@ -16,6 +16,7 @@ int cantidad_procesos_realizados, cpu_ocioso;
 int algoritmo;
 int quantum = 0; 
 int procesos_cola;
+int cant_procesos=0;
 
  
 typedef struct proceso {
@@ -33,9 +34,16 @@ typedef struct proceso {
 proceso_ptr front = NULL;
 proceso_ptr rear = NULL;
 
+proceso_ptr proc_ejecutados_front = NULL;
+proceso_ptr proc_ejecutados_rear = NULL;
+
 bool is_empty(){
 
 	return (front == NULL);
+}
+bool is_empty_ejec(){
+
+	return (proc_ejecutados_front == NULL);
 }
 
 void push(struct proceso p)
@@ -55,7 +63,23 @@ void push(struct proceso p)
 		rear = item;
 	}
 }
- 
+void push_ejecutados(struct proceso p)
+{
+	//printf("Push: %d, %d, %d", p.pid, p.burst,p.priority);
+	proceso_ptr item = (proceso_ptr) malloc(sizeof(struct proceso));
+	item->pid=p.pid;
+	item->burst=p.burst;
+	item->priority=p.priority;
+	item->ejecutado=p.ejecutado;
+	item->estado=p.estado;
+	//item->anterior=NULL;
+	if(proc_ejecutados_rear == NULL)
+		proc_ejecutados_front = proc_ejecutados_rear = item;
+	else{
+		proc_ejecutados_rear->anterior = item;
+		proc_ejecutados_rear = item;
+	}
+}
 proceso_ptr pop()
 {
 	proceso_ptr temp = front;
@@ -80,6 +104,25 @@ void display(){
 		temp = temp->anterior;
 	}
 	printf(" <- rear]\n");
+
+}
+void display_ejecutados(){
+
+	if(is_empty_ejec()){
+
+		printf("\nCola ejecutados vacia!\n");
+		return;
+	}
+	proceso_ptr temp = proc_ejecutados_front;
+	printf("\n[f ejecutado-> ");
+
+	while(temp != NULL){
+		//printf("- [%d], [%d], [%d] -", temp->pid,temp->burst,temp->priority);
+		printf("[%d]", temp->pid);
+		printf("[%d]", temp->wt);
+		temp = temp->anterior;
+	}
+	printf(" <- r ejecutado]\n");
 
 }
 int cola_size(){
@@ -120,50 +163,117 @@ void func(int sockfd)
 	} 
 }
 
-
-void FCFS(){
-	// sleep(5);
+void HPF()
+{
+	int cant_cola = cola_size();
 	int n = 0;
 	n = procesos_cola;
+	int sumw=0,sumt=0;
+	float avgwt=0.0,avgta=0.0;
+	int i,j;
+	int x = 0;
 	proceso_ptr temp = front;
+	proceso_ptr t;
+		for(i=2;i<n;i++)
+		for(j=1;j<n-i+1;j++){
+			if(temp->priority > temp->anterior->priority){
+				t = temp;
+				temp = temp->anterior;
+				temp->anterior = t;
+			}
+		}
+	printf("\n\n PROC.\tB.T.");
+		for(i=0;i<n;i++)
+			printf("\n %d\t%d",temp->pid,temp->burst);
+
+		sumw = temp->wt = 0;
+		sumt = temp->ta = temp->burst;
+
+		for(i=1;i<n;i++){
+			temp->wt = (temp[i-1].burst + temp[i-1].wt);
+			temp->ta = (temp->wt + temp->burst);
+			sumw+=temp->wt;
+			sumt+=temp->ta;
+		}
+		avgwt = (float)sumw/n;
+		avgta = (float)sumt/n;
+		printf("\n\n PROC.\tB.T.\tW.T\tT.A.T");
+		for(i=0;i<n;i++)
+			printf("\n %s\t%d\t%d\t%d",temp->pid,temp->burst,temp->wt,temp->ta);
+		
+		printf("\n\n GANTT CHART\n ");
+		for(i=0;i<n;i++)
+			printf("   %s   ",temp->pid);
+		printf("\n ");
+		printf("0\t");
+		for(i=1;i<=n;i++){
+			x+=temp[i-1].burst;
+			printf("%d      ",x);
+		}
+		printf("\n\n Average waiting time = %0.2f\n Average turn-around = %0.2f.",avgwt,avgta);
+
+}
+void SJF(){
+	int sumw=0,sumt=0;
+	int x = 0;
+	float avgwt=0.0,avgta=0.0;
+	int i,j;
+}
+void RR(){
+	int pflag=0,t,tcurr=0,k,i,Q=0;
+	int sumw=0,sumt=0;
+	float avgwt=0.0,avgta=0.0;
+}
+
+void FCFS(){
 	int sumw=0,sumt=0;
 	int wt=0;
 	int x = 0;
 	float avgwt=0.0,avgta=0.0;
-	int i,j;
-	for(i=1;i<n;i++){
-		if(temp->anterior != NULL){
-			temp->wt = wt; //ta del temp-1 o la suma de los burst que ya se ejecutaron
-			temp->ta = temp->wt+temp->burst;
-			sumw+= temp->ta;
-			sumt+=temp->ta;
-			wt+= temp->burst;
-			temp = temp->anterior;
-
-		}
+	int cant_cola = cola_size();
+	int n = 0;
+	n = procesos_cola;
+	proceso_ptr temp = front;
+	sleep(5);
+	if(cant_cola!=0){
+		//for(i=1;i<n;i++){
+			while(temp->anterior != NULL){
+				temp->wt = wt; //ta del temp-1 o la suma de los burst que ya se ejecutaron
+				temp->ta = temp->wt+temp->burst;
+				sumw+= wt;
+				sumt+=temp->ta;
+				wt+= temp->burst;
+				sleep(temp->burst);
+				temp = temp->anterior;
+				proceso_ptr temp_proccess2 = (proceso_ptr) malloc(sizeof (struct proceso));
+				temp_proccess2= pop();
+				printf("temp burst: %d - ta:%d", temp_proccess2->burst, temp_proccess2->ta );
+				push_ejecutados(*temp_proccess2);
+			}
+		sleep(temp->burst);
+		//proc_ejecutados_front->anterior;
 		temp->wt = wt; //(temp->anterior->ta); //ta del temp-1 o la sumw de los burst que ya se ejecutaron
 		temp->ta =  temp->wt +  temp->burst;
 		sumt+=temp->ta;
-	
-	}
-	avgwt = (float)sumw/n;
-	avgta = (float)sumt/n;
-	printf("\n\n PROC.\tB.T.\tW.T\tT.A.T");
-	proceso_ptr temp1 = front;
+		cant_cola--;
 
-	for(i=0;i<n;i++){
-		//printf("for i = %d ",i);
-		if(temp1->anterior != NULL){
+		proceso_ptr temp_proccess2 = (proceso_ptr) malloc(sizeof (struct proceso));
+		temp_proccess2= pop();
+		push_ejecutados(*temp_proccess2);
+
+		avgwt = (float)sumw/cant_procesos;
+		avgta = (float)sumt/cant_procesos;
+		display_ejecutados();
+		printf("\n\n PROC.\tB.T.\tW.T\tT.A.T");
+		proceso_ptr temp1 = proc_ejecutados_front;
+		while(temp1->anterior != NULL){
 			printf("\n %d\t%d\t%d\t%d",temp1->pid,temp1->burst,temp1->wt,temp1->ta);
-		}else{
-			printf("\n %d\t%d\t%d\t%d",temp1->pid,temp1->burst,temp1->wt,temp1->ta);
+			temp1 = temp1->anterior;
 		}
-		temp1 = temp1->anterior;
+		printf("\n %d\t%d\t%d\t%d",temp1->pid,temp1->burst,temp1->wt,temp1->ta);
+		printf("\n\n Average waiting time = %0.2f - Average turn-around = %0.2f.",avgwt,avgta);
 	}
-
-	printf("\n\n Average waiting time = %0.2f - Average turn-around = %0.2f.",avgwt,avgta);
 }
-
 
 void *job_scheduler(void * sockfd){
 
@@ -178,12 +288,10 @@ void *job_scheduler(void * sockfd){
 	
 //	infinite loop for chat 
 	 for (;;) {
-
 		char respuesta[MAX] = " Proceso recibido. PID: ";
 		bzero(buff, MAX); 
 		read(sockfd, buff, sizeof(buff)); 
 		char str[MAX];
-
 		printf("servidor recibe:  %s\n", buff);
 		char *temp = strtok(buff," ");		
 		// if(strlen(buff)==0){
@@ -220,6 +328,8 @@ void *job_scheduler(void * sockfd){
 			temp_proccess->estado=false;
 			temp_proccess->ejecutado=0;
 			procesos_cola++;
+			cant_procesos++;
+			
 			push(*temp_proccess);
 
 		}
@@ -241,8 +351,8 @@ void *cpu_scheduler(void *algoritmo){
 				int a =1;
 				//printf("\nThe queue is empty!\n");
 			}else{
-				sleep(10);
 				FCFS();
+				//display_ejecutados();
 			}
 		}
 		else if (algoritmo ==2){
@@ -347,6 +457,4 @@ int main()
 
 	// After chatting close the socket 
 	// close(sockfd); 
-} 
-
-
+}
