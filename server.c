@@ -160,11 +160,8 @@ void FCFS(){
 		}
 		temp1 = temp1->anterior;
 	}
-	else{
-		printf("entrando de nuevo");
-		FCFS();
-	}
-		printf("\n\n Average waiting time = %0.2f - Average turn-around = %0.2f.",avgwt,avgta);
+
+	printf("\n\n Average waiting time = %0.2f - Average turn-around = %0.2f.",avgwt,avgta);
 }
 void *job_scheduler(void * sockfd){
 
