@@ -135,7 +135,7 @@ void FCFS(){
 		if(temp->anterior != NULL){
 			temp->wt = wt; //ta del temp-1 o la suma de los burst que ya se ejecutaron
 			temp->ta = temp->wt+temp->burst;
-			sumw+= temp->ta;
+			sumw+= wt
 			sumt+=temp->ta;
 			wt+= temp->burst;
 			temp = temp->anterior;
