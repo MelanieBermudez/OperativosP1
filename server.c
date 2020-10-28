@@ -47,6 +47,7 @@ void push(struct proceso p)
 	item->priority=p.priority;
 	item->ejecutado=p.ejecutado;
 	item->estado=p.estado;
+	//item->anterior=NULL;
 	if(rear == NULL)
 		front = rear = item;
 	else{
@@ -158,20 +159,19 @@ void FCFS(){
 	avgwt = (float)sumw/n;
 	avgta = (float)sumt/n;
 	printf("\n\n PROC.\tB.T.\tW.T\tT.A.T");
-	for(i=0;i<n;i++)
-		printf("\n %d\t%d\t%d\t%d",temp->pid,temp->burst,temp->wt,temp->ta);
-	
-	printf("\n\n GANTT CHART\n ");
-	for(i=0;i<n;i++)
-		printf("   %d   ",temp->pid);
-	printf("\n ");
+	proceso_ptr temp1 = front;
 
-	printf("0\t");
-	for(i=1;i<=n;i++){
-		x+=temp[i-1].burst;
-		printf("%d      ",x);
+	for(i=0;i<n;i++){
+		//printf("for i = %d ",i);
+		if(temp1->anterior != NULL){
+			printf("\n %d\t%d\t%d\t%d",temp1->pid,temp1->burst,temp1->wt,temp1->ta);
+		}else{
+			printf("\n %d\t%d\t%d\t%d",temp1->pid,temp1->burst,temp1->wt,temp1->ta);
+		}
+		temp1 = temp1->anterior;
 	}
-	printf("\n\n Average waiting time = %0.2f\n Average turn-around = %0.2f.",avgwt,avgta);
+
+	printf("\n\n Average waiting time = %0.2f - Average turn-around = %0.2f.",avgwt,avgta);
 }
 void *job_scheduler(void * sockfd){
 
@@ -246,8 +246,10 @@ void *cpu_scheduler(void *algoritmo){
 	for(;;){
 		if (algoritmo ==1){
 			if(is_empty()){
-			printf("\nThe queue is empty!\n");
+				int a =1;
+				//printf("\nThe queue is empty!\n");
 			}else{
+				sleep(10);
 				FCFS();
 			}
 		}
