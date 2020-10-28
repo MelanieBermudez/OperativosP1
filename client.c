@@ -10,7 +10,7 @@
 #define PORT 8080 
 #define SA struct sockaddr 
 //Define para menu consola
-#define MAXCHAR 1000
+
 int modo,flag,rangomin,rangomax,tasa;
 
 typedef struct {
@@ -26,14 +26,12 @@ void *send_thread(void *args){
 	int socckfd= *actual_args->socketfd;
 	char *str1 = actual_args->buffer;
 	sleep(2);
-
 	printf("\nto Server : %s \n", str1); 
 	write(socckfd, str1, sizeof(str1)); 
 	bzero(buff, sizeof( buff)); 				
 	read( socckfd,  buff, sizeof(buff)); 
 	printf("\nFrom Server : %s \n", buff); 
 	pthread_exit(0);	
-	
 }
 void func(int sockfd, int modo,int rangomin,int rangomax,int tasa) 
 { 
@@ -52,7 +50,7 @@ void func(int sockfd, int modo,int rangomin,int rangomax,int tasa)
 		if (fp==NULL){
 			printf("Could not open file %s", filename);
 		}
-			while(fgets(buff,MAXCHAR,fp)!= NULL){
+			while(fgets(buff,MAX,fp)!= NULL){
 
 			SendThread * args = malloc(sizeof *args);
 			args ->socketfd = &sockfd;
@@ -112,7 +110,7 @@ void* myThreadRead(void *arg){
 	if (fp==NULL){
 		printf("Could not open file %s", filename);
 	}	 
-	while(fgets(buff,MAXCHAR,fp)!= NULL){
+	while(fgets(buff,MAX,fp)!= NULL){
 		printf("buff %s", buff);
 		sleep(2);
 
