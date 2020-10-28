@@ -120,53 +120,31 @@ void func(int sockfd)
 	} 
 }
 
-void b_sort(proceso_ptr temp[],int n)
-{
-	// proceso_ptr t;
-	// int i,j;
-	// for(i=1;i<n;i++)
-	// 	for(j=0;j<n-i;j++){
-	// 		if(temp[j].at > temp[j+1].at){
-	// 			t = temp[j];
-	// 			temp[j] = temp[j+1];
-	// 			temp[j+1] = t;
-	// 		}
-	// 	}
-}
 
 void FCFS(){
-	sleep(5);
+	// sleep(5);
 	int n = 0;
-	printf("dentro de fcfs");
 	n = procesos_cola;
 	proceso_ptr temp = front;
-	printf("\n n %d",procesos_cola);
-	printf("\ntemp %d", temp->pid);
 	int sumw=0,sumt=0;
+	int wt=0;
 	int x = 0;
 	float avgwt=0.0,avgta=0.0;
 	int i,j;
-	//sumw = temp->wt = 0;
-	//sumt = temp->ta = temp->burst;
-	// printf("\n\n PROC.\tB.T.");
-	// for(i=0;i<n;i++)
-	// 		printf("\n %d\t%d",temp->pid,temp->burst);
 	for(i=1;i<n;i++){
 		if(temp->anterior != NULL){
-			temp->wt = sumw; //ta del temp-1 o la suma de los burst que ya se ejecutaron
-			temp->ta = sumt+temp->burst;
-			sumw+=temp->anterior->wt;
+			temp->wt = wt; //ta del temp-1 o la suma de los burst que ya se ejecutaron
+			temp->ta = temp->wt+temp->burst;
+			sumw+= temp->ta;
 			sumt+=temp->ta;
-			printf("\n %d",temp->anterior->ta);
+			wt+= temp->burst;
+			temp = temp->anterior;
 
-		}else{
-			printf("\n %d\t%d",temp->pid,temp->burst);
-			temp->wt = (temp->anterior->ta); //ta del temp-1 o la suma de los burst que ya se ejecutaron
-			temp->ta = (temp->anterior->ta + temp->burst);
-			sumw+=temp->wt;
-			sumt+=temp->ta;
 		}
-		temp = temp->anterior;
+		temp->wt = wt; //(temp->anterior->ta); //ta del temp-1 o la sumw de los burst que ya se ejecutaron
+		temp->ta =  temp->wt +  temp->burst;
+		sumt+=temp->ta;
+	
 	}
 	avgwt = (float)sumw/n;
 	avgta = (float)sumt/n;
@@ -185,6 +163,8 @@ void FCFS(){
 
 	printf("\n\n Average waiting time = %0.2f - Average turn-around = %0.2f.",avgwt,avgta);
 }
+
+
 void *job_scheduler(void * sockfd){
 
 	char buff[MAX]; 
@@ -286,6 +266,9 @@ void* verificar_cola(){
 		if(n==5){
 			display();
 		}
+		else if(n==7){
+			FCFS();
+		}
 		else if(n==6){
 			break;
 		}
@@ -294,6 +277,7 @@ void* verificar_cola(){
 
 int main() 
 { 
+	
 	int sockfd, connfd, len; 
 	struct sockaddr_in servaddr, cli; 
 	// socket create and verification 
@@ -338,7 +322,6 @@ int main()
 		printf("server acccept the client...\n"); 
 	
 	printf("---------- Menu de opciones ---------- ");
-    printf("\nSeleccione el algoritmo: ");
     printf("\n 1. FIFO ");
     printf("\n 2. SJF ");
     printf("\n 3. HPF ");
