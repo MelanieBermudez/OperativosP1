@@ -12,9 +12,10 @@
 #define PORT 8080 
 #define SA struct sockaddr 
 
-int cantidad_procesos, cpu_ocioso;
+int cantidad_procesos_realizados, cpu_ocioso;
 int algoritmo;
 int quantum = 0; 
+
  
 typedef struct proceso {
 	int pid;
@@ -22,6 +23,8 @@ typedef struct proceso {
 	int priority;
 	bool estado;
 	int ejecutado;
+	int wt,ta;
+	int flag;
 	struct proceso *anterior;
 
  }*proceso_ptr;
@@ -77,6 +80,20 @@ void display(){
 	printf(" <- rear]\n");
 
 }
+int cola_size(){
+	int n =0;
+	if(is_empty()){
+
+		printf("\nThe queue is empty!\n");
+		return 0;
+	}
+	proceso_ptr temp = front;
+	while(temp != NULL){
+		n++;
+		temp = temp->anterior;
+	}
+	return n;
+}
 
 void func(int sockfd) 
 { 
@@ -115,49 +132,49 @@ void b_sort(proceso_ptr temp[],int n)
 	// 	}
 }
 
-void FCFS(proceso_ptr P[],int n){
-	// proceso_ptr temp[10];
-	// int sumw=0,sumt=0;
-	// int x = 0;
-	// float avgwt=0.0,avgta=0.0;
-	// int i,j;
-	// for(i=0;i<n;i++)
-	// 	temp[i]=P[i];
+void FCFS(){
+	
+	if(is_empty()){
+		printf("VACIA");
+		FCFS();
+	}
+	else{
+		int n = cola_size();
+		printf("n %d",n);
+		proceso_ptr temp = front;
+		int sumw=0,sumt=0;
+		int x = 0;
+		float avgwt=0.0,avgta=0.0;
+		int i,j;
+			while(temp != NULL){
+				printf("\n %s\t%d",temp->pid,temp->burst);
+				temp->wt = (temp->anterior->burst + temp->anterior->wt); //ta del temp-1 o la suma de los burst que ya se ejecutaron
+				temp->ta = (temp->wt + temp->burst);
+				sumw+=temp->wt;
+				sumt+=temp->ta;
+				temp = temp->anterior;
+			}
+			avgwt = (float)sumw/n;
+			avgta = (float)sumt/n;
+			printf("\n\n PROC.\tB.T.\tW.T\tT.A.T");
+			for(i=0;i<n;i++)
+				printf("\n %s\t%d\t%d\t%d",temp->pid,temp->burst,temp->wt,temp->ta);
+			
+			printf("\n\n GANTT CHART\n ");
+			for(i=0;i<n;i++)
+				printf("   %s   ",temp->pid);
+			printf("\n ");
 
-	// b_sort(temp,n);
+			printf("0\t");
+			for(i=1;i<=n;i++){
+				x+=temp[i-1].burst;
+				printf("%d      ",x);
+			}
+			printf("\n\n Average waiting time = %0.2f\n Average turn-around = %0.2f.",avgwt,avgta);
 
-	// 	printf("\n\n PROC.\tB.T.\tA.T.");
-	// 	for(i=0;i<n;i++)
-	// 		printf("\n %s\t%d\t%d",temp[i].name,temp[i].bt,temp[i].at);
+	}
 
-	// 	sumw = temp[0].wt = 0;
-	// 	sumt = temp[0].ta = temp[0].bt - temp[0].at;
-
-	// 	for(i=1;i<n;i++){
-	// 		temp[i].wt = (temp[i-1].bt + temp[i-1].at + temp[i-1].wt) - temp[i].at;;
-	// 		temp[i].ta = (temp[i].wt + temp[i].bt);
-	// 		sumw+=temp[i].wt;
-	// 		sumt+=temp[i].ta;
-	// 	}
-	// 	avgwt = (float)sumw/n;
-	// 	avgta = (float)sumt/n;
-	// 	printf("\n\n PROC.\tB.T.\tA.T.\tW.T\tT.A.T");
-	// 	for(i=0;i<n;i++)
-	// 		printf("\n %s\t%d\t%d\t%d\t%d",temp[i].name,temp[i].bt,temp[i].at,temp[i].wt,temp[i].ta);
-		
-	// 	printf("\n\n GANTT CHART\n ");
-	// 	for(i=0;i<n;i++)
-	// 		printf("   %s   ",temp[i].name);
-	// 	printf("\n ");
-
-	// 	printf("0\t");
-	// 	for(i=1;i<=n;i++){
-	// 		x+=temp[i-1].bt;
-	// 		printf("%d      ",x);
-	// 	}
-	// 	printf("\n\n Average waiting time = %0.2f\n Average turn-around = %0.2f.",avgwt,avgta);
 }
-
 void *job_scheduler(void * sockfd){
 
 	char buff[MAX]; 
@@ -226,9 +243,9 @@ void *job_scheduler(void * sockfd){
 // Driver function 
 
 void *cpu_scheduler(void *algoritmo){
-	
+	printf("algoritmo: %d ", algoritmo);
 	if (algoritmo ==1){
-		printf("FIFO");
+		FCFS();
 	}
 	else if (algoritmo ==2){
 		printf("SJF");
@@ -248,7 +265,9 @@ void* verificar_cola(){
 	for(;;){
 		scanf("%d", &n);
 		if(n==5){
-			display();
+			//display();
+			int s = cola_size();
+			printf("s %d",s);
 		}
 		else if(n==6){
 			break;
@@ -258,18 +277,6 @@ void* verificar_cola(){
 
 int main() 
 { 
-	printf("---------- Menu de opciones ---------- ");
-    printf("\nSeleccione el algoritmo: ");
-    printf("\n 1. FIFO ");
-    printf("\n 2. SJF ");
-    printf("\n 3. HPF ");
-    printf("\n 4. ROUND ROBIN");
-	printf("\n 5. Verificar la cola\n");
-	printf("\n 6. Terminar la ejecucion\n");
-
-	
-	scanf("%d", &algoritmo);
-
 	int sockfd, connfd, len; 
 	struct sockaddr_in servaddr, cli; 
 	// socket create and verification 
@@ -312,6 +319,17 @@ int main()
 	} 
 	else
 		printf("server acccept the client...\n"); 
+	
+	printf("---------- Menu de opciones ---------- ");
+    printf("\nSeleccione el algoritmo: ");
+    printf("\n 1. FIFO ");
+    printf("\n 2. SJF ");
+    printf("\n 3. HPF ");
+    printf("\n 4. ROUND ROBIN");
+	printf("\n 5. Verificar la cola\n");
+	printf("\n 6. Terminar la ejecucion\n");
+	
+	scanf("%d", &algoritmo);
 
 	pthread_t job_scheduler_thread;
 	pthread_t cpu_scheduler_thread;
