@@ -163,6 +163,8 @@ void FCFS(){
 
 	printf("\n\n Average waiting time = %0.2f - Average turn-around = %0.2f.",avgwt,avgta);
 }
+
+
 void *job_scheduler(void * sockfd){
 
 	char buff[MAX]; 
@@ -255,7 +257,7 @@ void *cpu_scheduler(void *algoritmo){
 			scanf("%d", &quantum);
 		}
 	}
-	}
+	
 }
 void* verificar_cola(){
 	int n;
