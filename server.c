@@ -15,6 +15,7 @@
 int cantidad_procesos_realizados, cpu_ocioso;
 int algoritmo;
 int quantum = 0; 
+int procesos_cola;
 
  
 typedef struct proceso {
@@ -133,47 +134,44 @@ void b_sort(proceso_ptr temp[],int n)
 }
 
 void FCFS(){
+	sleep(5);
+	int n = 0;
+	printf("dentro de fcfs");
+	n = procesos_cola;
+	proceso_ptr temp = front;
+	printf("\n n %d",procesos_cola);
+	printf("\ntemp %d", temp->pid);
+	int sumw=0,sumt=0;
+	int x = 0;
+	float avgwt=0.0,avgta=0.0;
+	int i,j;
+	sumw = temp->wt = 0;
+	sumt = temp->ta = temp->burst;
+	for(i=1;i<n;i++){
+		printf("\n %d\t%d",temp->pid,temp->burst);
+		temp->wt = (temp->anterior->burst + temp->anterior->wt); //ta del temp-1 o la suma de los burst que ya se ejecutaron
+		temp->ta = (temp->wt + temp->burst);
+		sumw+=temp->wt;
+		sumt+=temp->ta;
+		temp = temp->anterior;
+	}
+	avgwt = (float)sumw/n;
+	avgta = (float)sumt/n;
+	printf("\n\n PROC.\tB.T.\tW.T\tT.A.T");
+	for(i=0;i<n;i++)
+		printf("\n %d\t%d\t%d\t%d",temp->pid,temp->burst,temp->wt,temp->ta);
 	
-	if(is_empty()){
-		printf("VACIA");
-		FCFS();
+	printf("\n\n GANTT CHART\n ");
+	for(i=0;i<n;i++)
+		printf("   %d   ",temp->pid);
+	printf("\n ");
+
+	printf("0\t");
+	for(i=1;i<=n;i++){
+		x+=temp[i-1].burst;
+		printf("%d      ",x);
 	}
-	else{
-		int n = cola_size();
-		printf("n %d",n);
-		proceso_ptr temp = front;
-		int sumw=0,sumt=0;
-		int x = 0;
-		float avgwt=0.0,avgta=0.0;
-		int i,j;
-			while(temp != NULL){
-				printf("\n %s\t%d",temp->pid,temp->burst);
-				temp->wt = (temp->anterior->burst + temp->anterior->wt); //ta del temp-1 o la suma de los burst que ya se ejecutaron
-				temp->ta = (temp->wt + temp->burst);
-				sumw+=temp->wt;
-				sumt+=temp->ta;
-				temp = temp->anterior;
-			}
-			avgwt = (float)sumw/n;
-			avgta = (float)sumt/n;
-			printf("\n\n PROC.\tB.T.\tW.T\tT.A.T");
-			for(i=0;i<n;i++)
-				printf("\n %s\t%d\t%d\t%d",temp->pid,temp->burst,temp->wt,temp->ta);
-			
-			printf("\n\n GANTT CHART\n ");
-			for(i=0;i<n;i++)
-				printf("   %s   ",temp->pid);
-			printf("\n ");
-
-			printf("0\t");
-			for(i=1;i<=n;i++){
-				x+=temp[i-1].burst;
-				printf("%d      ",x);
-			}
-			printf("\n\n Average waiting time = %0.2f\n Average turn-around = %0.2f.",avgwt,avgta);
-
-	}
-
+	printf("\n\n Average waiting time = %0.2f\n Average turn-around = %0.2f.",avgwt,avgta);
 }
 void *job_scheduler(void * sockfd){
 
@@ -229,6 +227,7 @@ void *job_scheduler(void * sockfd){
 			temp_proccess->anterior= NULL;
 			temp_proccess->estado=false;
 			temp_proccess->ejecutado=0;
+			procesos_cola++;
 			push(*temp_proccess);
 
 		}
@@ -243,20 +242,26 @@ void *job_scheduler(void * sockfd){
 // Driver function 
 
 void *cpu_scheduler(void *algoritmo){
-	printf("algoritmo: %d ", algoritmo);
-	if (algoritmo ==1){
-		FCFS();
-	}
-	else if (algoritmo ==2){
-		printf("SJF");
-	}
-	else if (algoritmo ==3){
-		printf("HPF");
-	}
-	else if (algoritmo ==4){
-		printf("Round Robin");
-		printf("\nIngrese el quantum: ");
-		scanf("%d", &quantum);
+	int n; 
+	for(;;){
+		if (algoritmo ==1){
+			if(is_empty()){
+			printf("\nThe queue is empty!\n");
+			}else{
+				FCFS();
+			}
+		}
+		else if (algoritmo ==2){
+			printf("SJF");
+		}
+		else if (algoritmo ==3){
+			printf("HPF");
+		}
+		else if (algoritmo ==4){
+			printf("Round Robin");
+			printf("\nIngrese el quantum: ");
+			scanf("%d", &quantum);
+		}
 	}
 	
 }
@@ -265,9 +270,7 @@ void* verificar_cola(){
 	for(;;){
 		scanf("%d", &n);
 		if(n==5){
-			//display();
-			int s = cola_size();
-			printf("s %d",s);
+			display();
 		}
 		else if(n==6){
 			break;
