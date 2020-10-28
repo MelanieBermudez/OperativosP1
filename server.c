@@ -46,6 +46,7 @@ void push(struct proceso p)
 	item->priority=p.priority;
 	item->ejecutado=p.ejecutado;
 	item->estado=p.estado;
+	item->anterior=NULL;
 	if(rear == NULL)
 		front = rear = item;
 	else{
@@ -95,74 +96,51 @@ int cola_size(){
 	return n;
 }
 
-void func(int sockfd) 
-{ 
-	char buff[MAX]; 
-	char str;
-	char str1[MAX] = " Proceso recibido ";
-	int n,read_size; 
-	bzero(buff, sizeof(buff)); 
-
-	char cola[]={};
-
-	bzero(buff, sizeof(buff)); 
-	
-	// infinite loop for chat 
-	 for (;;) { 
-		bzero(buff, MAX); 
-		read(sockfd, buff, sizeof(buff));
-	
-		puts(buff);
-		
-		write(sockfd, str1, sizeof(str1)); 
-	} 
-}
-
-void b_sort(proceso_ptr temp[],int n)
-{
-	// proceso_ptr t;
-	// int i,j;
-	// for(i=1;i<n;i++)
-	// 	for(j=0;j<n-i;j++){
-	// 		if(temp[j].at > temp[j+1].at){
-	// 			t = temp[j];
-	// 			temp[j] = temp[j+1];
-	// 			temp[j+1] = t;
-	// 		}
-	// 	}
-}
 
 void FCFS(){
-	
-	if(is_empty()){
-		printf("VACIA");
-		FCFS();
-	}
-	else{
-		int n = cola_size();
-		printf("n %d",n);
+	sleep(5);
+	int n = cola_size();
+	if(n>0){
+		proceso_ptr item = (proceso_ptr) malloc(sizeof(struct proceso));
+		printf("ALGO");
 		proceso_ptr temp = front;
 		int sumw=0,sumt=0;
 		int x = 0;
 		float avgwt=0.0,avgta=0.0;
 		int i,j;
-			while(temp != NULL){
-				printf("\n %s\t%d",temp->pid,temp->burst);
+		while(temp != NULL){
+			if(temp->anterior != NULL){
+				printf("\n %d\t%d",temp->pid,temp->burst);
 				temp->wt = (temp->anterior->burst + temp->anterior->wt); //ta del temp-1 o la suma de los burst que ya se ejecutaron
 				temp->ta = (temp->wt + temp->burst);
 				sumw+=temp->wt;
 				sumt+=temp->ta;
 				temp = temp->anterior;
+			}else{
+
+				temp->wt = 0;
+				temp->ta = temp->burst;
+				sumw+=temp->wt;
+				sumt+=temp->ta;
+				// printf("sum%d",sumw);
+
 			}
+		}
+
+
+
+
+
+
 			avgwt = (float)sumw/n;
 			avgta = (float)sumt/n;
 			printf("\n\n PROC.\tB.T.\tW.T\tT.A.T");
 			for(i=0;i<n;i++)
-				printf("\n %s\t%d\t%d\t%d",temp->pid,temp->burst,temp->wt,temp->ta);
+				printf("\n %d\t%d\t%d\t%d",temp->pid,temp->burst,temp->wt,temp->ta);
 			
 			printf("\n\n GANTT CHART\n ");
 			for(i=0;i<n;i++)
-				printf("   %s   ",temp->pid);
+				printf("   %d   ",temp->pid);
 			printf("\n ");
 
 			printf("0\t");
@@ -173,6 +151,41 @@ void FCFS(){
 			printf("\n\n Average waiting time = %0.2f\n Average turn-around = %0.2f.",avgwt,avgta);
 
 	}
+	else{
+		printf("entrando de nuevo");
+		FCFS();
+	}
+		// int sumw=0,sumt=0;
+		// int x = 0;
+		// float avgwt=0.0,avgta=0.0;
+		// int i,j;
+			// while(temp != NULL){
+			// 	printf("\n %s\t%d",temp->pid,temp->burst);
+			// 	temp->wt = (temp->anterior->burst + temp->anterior->wt); //ta del temp-1 o la suma de los burst que ya se ejecutaron
+			// 	temp->ta = (temp->wt + temp->burst);
+			// 	sumw+=temp->wt;
+			// 	sumt+=temp->ta;
+			// 	temp = temp->anterior;
+			// }
+			// avgwt = (float)sumw/n;
+			// avgta = (float)sumt/n;
+			// printf("\n\n PROC.\tB.T.\tW.T\tT.A.T");
+			// for(i=0;i<n;i++)
+			// 	printf("\n %s\t%d\t%d\t%d",temp->pid,temp->burst,temp->wt,temp->ta);
+			
+			// printf("\n\n GANTT CHART\n ");
+			// for(i=0;i<n;i++)
+			// 	printf("   %s   ",temp->pid);
+			// printf("\n ");
+
+			// printf("0\t");
+			// for(i=1;i<=n;i++){
+			// 	x+=temp[i-1].burst;
+			// 	printf("%d      ",x);
+			// }
+			// printf("\n\n Average waiting time = %0.2f\n Average turn-around = %0.2f.",avgwt,avgta);
+
+	
 
 }
 void *job_scheduler(void * sockfd){
@@ -243,8 +256,10 @@ void *job_scheduler(void * sockfd){
 // Driver function 
 
 void *cpu_scheduler(void *algoritmo){
-	printf("algoritmo: %d ", algoritmo);
+	for(;;){
 	if (algoritmo ==1){
+		// sleep(10);
+		// printf("algoritmo: %d ", algoritmo);
 		FCFS();
 	}
 	else if (algoritmo ==2){
@@ -258,7 +273,7 @@ void *cpu_scheduler(void *algoritmo){
 		printf("\nIngrese el quantum: ");
 		scanf("%d", &quantum);
 	}
-	
+	}
 }
 void* verificar_cola(){
 	int n;
@@ -268,6 +283,9 @@ void* verificar_cola(){
 			//display();
 			int s = cola_size();
 			printf("s %d",s);
+		}
+		else if(n==7){
+			FCFS();
 		}
 		else if(n==6){
 			break;
@@ -322,7 +340,6 @@ int main()
 		printf("server acccept the client...\n"); 
 	
 	printf("---------- Menu de opciones ---------- ");
-    printf("\nSeleccione el algoritmo: ");
     printf("\n 1. FIFO ");
     printf("\n 2. SJF ");
     printf("\n 3. HPF ");
