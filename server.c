@@ -15,6 +15,7 @@
 int cantidad_procesos_realizados, cpu_ocioso;
 int algoritmo;
 int quantum = 0; 
+int procesos_cola;
 
  
 typedef struct proceso {
@@ -46,7 +47,7 @@ void push(struct proceso p)
 	item->priority=p.priority;
 	item->ejecutado=p.ejecutado;
 	item->estado=p.estado;
-	item->anterior=NULL;
+	//item->anterior=NULL;
 	if(rear == NULL)
 		front = rear = item;
 	else{
@@ -96,97 +97,74 @@ int cola_size(){
 	return n;
 }
 
+void func(int sockfd) 
+{ 
+	char buff[MAX]; 
+	char str;
+	char str1[MAX] = " Proceso recibido ";
+	int n,read_size; 
+	bzero(buff, sizeof(buff)); 
+
+	char cola[]={};
+
+	bzero(buff, sizeof(buff)); 
+	
+	// infinite loop for chat 
+	 for (;;) { 
+		bzero(buff, MAX); 
+		read(sockfd, buff, sizeof(buff));
+	
+		puts(buff);
+		
+		write(sockfd, str1, sizeof(str1)); 
+	} 
+}
+
 
 void FCFS(){
-	sleep(5);
-	int n = cola_size();
-	if(n>0){
-		proceso_ptr item = (proceso_ptr) malloc(sizeof(struct proceso));
-		printf("ALGO");
-		proceso_ptr temp = front;
-		int sumw=0,sumt=0;
-		int x = 0;
-		float avgwt=0.0,avgta=0.0;
-		int i,j;
-		while(temp != NULL){
-			if(temp->anterior != NULL){
-				printf("\n %d\t%d",temp->pid,temp->burst);
-				temp->wt = (temp->anterior->burst + temp->anterior->wt); //ta del temp-1 o la suma de los burst que ya se ejecutaron
-				temp->ta = (temp->wt + temp->burst);
-				sumw+=temp->wt;
-				sumt+=temp->ta;
-				temp = temp->anterior;
-			}else{
+	// sleep(5);
+	int n = 0;
+	n = procesos_cola;
+	proceso_ptr temp = front;
+	int sumw=0,sumt=0;
+	int wt=0;
+	int x = 0;
+	float avgwt=0.0,avgta=0.0;
+	int i,j;
+	for(i=1;i<n;i++){
+		if(temp->anterior != NULL){
+			temp->wt = wt; //ta del temp-1 o la suma de los burst que ya se ejecutaron
+			temp->ta = temp->wt+temp->burst;
+			sumw+= temp->ta;
+			sumt+=temp->ta;
+			wt+= temp->burst;
+			temp = temp->anterior;
 
-				temp->wt = 0;
-				temp->ta = temp->burst;
-				sumw+=temp->wt;
-				sumt+=temp->ta;
-				// printf("sum%d",sumw);
-
-			}
 		}
+		temp->wt = wt; //(temp->anterior->ta); //ta del temp-1 o la sumw de los burst que ya se ejecutaron
+		temp->ta =  temp->wt +  temp->burst;
+		sumt+=temp->ta;
+	
+	}
+	avgwt = (float)sumw/n;
+	avgta = (float)sumt/n;
+	printf("\n\n PROC.\tB.T.\tW.T\tT.A.T");
+	proceso_ptr temp1 = front;
 
-
-
-
-
-
-			avgwt = (float)sumw/n;
-			avgta = (float)sumt/n;
-			printf("\n\n PROC.\tB.T.\tW.T\tT.A.T");
-			for(i=0;i<n;i++)
-				printf("\n %d\t%d\t%d\t%d",temp->pid,temp->burst,temp->wt,temp->ta);
-			
-			printf("\n\n GANTT CHART\n ");
-			for(i=0;i<n;i++)
-				printf("   %d   ",temp->pid);
-			printf("\n ");
-
-			printf("0\t");
-			for(i=1;i<=n;i++){
-				x+=temp[i-1].burst;
-				printf("%d      ",x);
-			}
-			printf("\n\n Average waiting time = %0.2f\n Average turn-around = %0.2f.",avgwt,avgta);
-
+	for(i=0;i<n;i++){
+		//printf("for i = %d ",i);
+		if(temp1->anterior != NULL){
+			printf("\n %d\t%d\t%d\t%d",temp1->pid,temp1->burst,temp1->wt,temp1->ta);
+		}else{
+			printf("\n %d\t%d\t%d\t%d",temp1->pid,temp1->burst,temp1->wt,temp1->ta);
+		}
+		temp1 = temp1->anterior;
 	}
 	else{
 		printf("entrando de nuevo");
 		FCFS();
 	}
-		// int sumw=0,sumt=0;
-		// int x = 0;
-		// float avgwt=0.0,avgta=0.0;
-		// int i,j;
-			// while(temp != NULL){
-			// 	printf("\n %s\t%d",temp->pid,temp->burst);
-			// 	temp->wt = (temp->anterior->burst + temp->anterior->wt); //ta del temp-1 o la suma de los burst que ya se ejecutaron
-			// 	temp->ta = (temp->wt + temp->burst);
-			// 	sumw+=temp->wt;
-			// 	sumt+=temp->ta;
-			// 	temp = temp->anterior;
-			// }
-			// avgwt = (float)sumw/n;
-			// avgta = (float)sumt/n;
-			// printf("\n\n PROC.\tB.T.\tW.T\tT.A.T");
-			// for(i=0;i<n;i++)
-			// 	printf("\n %s\t%d\t%d\t%d",temp->pid,temp->burst,temp->wt,temp->ta);
-			
-			// printf("\n\n GANTT CHART\n ");
-			// for(i=0;i<n;i++)
-			// 	printf("   %s   ",temp->pid);
-			// printf("\n ");
-
-			// printf("0\t");
-			// for(i=1;i<=n;i++){
-			// 	x+=temp[i-1].burst;
-			// 	printf("%d      ",x);
-			// }
-			// printf("\n\n Average waiting time = %0.2f\n Average turn-around = %0.2f.",avgwt,avgta);
-
-	
-
+		printf("\n\n Average waiting time = %0.2f - Average turn-around = %0.2f.",avgwt,avgta);
 }
 void *job_scheduler(void * sockfd){
 
@@ -242,6 +220,7 @@ void *job_scheduler(void * sockfd){
 			temp_proccess->anterior= NULL;
 			temp_proccess->estado=false;
 			temp_proccess->ejecutado=0;
+			procesos_cola++;
 			push(*temp_proccess);
 
 		}
@@ -256,22 +235,28 @@ void *job_scheduler(void * sockfd){
 // Driver function 
 
 void *cpu_scheduler(void *algoritmo){
+	int n; 
 	for(;;){
-	if (algoritmo ==1){
-		// sleep(10);
-		// printf("algoritmo: %d ", algoritmo);
-		FCFS();
-	}
-	else if (algoritmo ==2){
-		printf("SJF");
-	}
-	else if (algoritmo ==3){
-		printf("HPF");
-	}
-	else if (algoritmo ==4){
-		printf("Round Robin");
-		printf("\nIngrese el quantum: ");
-		scanf("%d", &quantum);
+		if (algoritmo ==1){
+			if(is_empty()){
+				int a =1;
+				//printf("\nThe queue is empty!\n");
+			}else{
+				sleep(10);
+				FCFS();
+			}
+		}
+		else if (algoritmo ==2){
+			printf("SJF");
+		}
+		else if (algoritmo ==3){
+			printf("HPF");
+		}
+		else if (algoritmo ==4){
+			printf("Round Robin");
+			printf("\nIngrese el quantum: ");
+			scanf("%d", &quantum);
+		}
 	}
 	}
 }
@@ -280,9 +265,7 @@ void* verificar_cola(){
 	for(;;){
 		scanf("%d", &n);
 		if(n==5){
-			//display();
-			int s = cola_size();
-			printf("s %d",s);
+			display();
 		}
 		else if(n==7){
 			FCFS();
