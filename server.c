@@ -146,14 +146,26 @@ void FCFS(){
 	int x = 0;
 	float avgwt=0.0,avgta=0.0;
 	int i,j;
-	sumw = temp->wt = 0;
-	sumt = temp->ta = temp->burst;
+	//sumw = temp->wt = 0;
+	//sumt = temp->ta = temp->burst;
+	// printf("\n\n PROC.\tB.T.");
+	// for(i=0;i<n;i++)
+	// 		printf("\n %d\t%d",temp->pid,temp->burst);
 	for(i=1;i<n;i++){
-		printf("\n %d\t%d",temp->pid,temp->burst);
-		temp->wt = (temp->anterior->burst + temp->anterior->wt); //ta del temp-1 o la suma de los burst que ya se ejecutaron
-		temp->ta = (temp->wt + temp->burst);
-		sumw+=temp->wt;
-		sumt+=temp->ta;
+		if(temp->anterior != NULL){
+			temp->wt = sumw; //ta del temp-1 o la suma de los burst que ya se ejecutaron
+			temp->ta = sumt+temp->burst;
+			sumw+=temp->anterior->wt;
+			sumt+=temp->ta;
+			printf("\n %d",temp->anterior->ta);
+
+		}else{
+			printf("\n %d\t%d",temp->pid,temp->burst);
+			temp->wt = (temp->anterior->ta); //ta del temp-1 o la suma de los burst que ya se ejecutaron
+			temp->ta = (temp->anterior->ta + temp->burst);
+			sumw+=temp->wt;
+			sumt+=temp->ta;
+		}
 		temp = temp->anterior;
 	}
 	avgwt = (float)sumw/n;
