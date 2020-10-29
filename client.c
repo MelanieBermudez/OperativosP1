@@ -153,13 +153,13 @@ int main()
 		scanf("%d", &tasa);
 		printf("\n Para terminar de ejecutar presione: 0 \n");
 
+		pthread_t cola_thread;
+		pthread_create(&cola_thread,NULL,verificar_cola ,NULL);
+
 		func(sockfd,modo,rangomin,rangomax,tasa);
+		pthread_join(cola_thread,NULL);
 		return 0;
 	}
-	pthread_t cola_thread;
-	pthread_create(&cola_thread,NULL,verificar_cola ,NULL);
-
-	pthread_join(cola_thread,NULL);
 	// close the socket 
 	// close(sockfd); 
 } 

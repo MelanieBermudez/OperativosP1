@@ -318,6 +318,9 @@ void SJF(){
 		temp_proccess2= pop();
 		printf("\nProceso ejecutado terminado: %d \n", temp_proccess2->pid);
 		push_ejecutados(*temp_proccess2);
+
+
+		
 		printf("\n\n PROC.\tB.T.\tW.T\tT.A.T");
 		proceso_ptr temp1 = proc_ejecutados_front;
 		while(temp1->anterior != NULL){
