@@ -12,6 +12,7 @@
 //Define para menu consola
 
 int modo,flag,rangomin,rangomax,tasa;
+int cancel=1;
 
 typedef struct {
 int *socketfd;
@@ -20,16 +21,17 @@ char *msg[MAX];
  }SendThread;
 
 void* verificar_cola(){
-	int cancel;
+	int opt;
 	for(;;){
-		scanf("%d", &cancel);
-		if(cancel==0){
+		scanf("%d", &opt);
+		if(opt==0){
+			printf("es 0");
+			cancel=0;
 			pthread_exit(0);
 		}
 	}
 }
  			
-
 void *send_thread(void *args){
 
 	SendThread *actual_args = args;
@@ -78,10 +80,8 @@ void func(int sockfd, int modo,int rangomin,int rangomax,int tasa)
 		int prioridad;
 		char buff[MAX]; 
 		char buffa[MAX] = "PROCESO ENVIADO";
-		int n; 
-		
-
-		for(;;){
+		int n=0;
+		while(cancel!=0){
 			burst = rand() % (rangomax + 1-rangomin)+rangomin;
 			prioridad = rand() % (rangomax + 1-rangomin)+rangomin;
 			bzero(buff, sizeof(buff)); 
@@ -97,7 +97,10 @@ void func(int sockfd, int modo,int rangomin,int rangomax,int tasa)
 			sleep(sleep_rand);
 			pthread_join(thread_send,NULL);
 			int pthread_cancel(pthread_t thread_send);
+			n++;
+			printf("\ncantidad de procesos %d:\n ", n);
 		}
+		pthread_exit(0);
 	}
 }
 
@@ -152,6 +155,10 @@ int main()
 		func(sockfd,modo,rangomin,rangomax,tasa);
 		return 0;
 	}
+	pthread_t cola_thread;
+	pthread_create(&cola_thread,NULL,verificar_cola ,NULL);
+
+	pthread_join(cola_thread,NULL);
 	// close the socket 
 	// close(sockfd); 
 } 
