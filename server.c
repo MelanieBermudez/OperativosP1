@@ -22,7 +22,7 @@ int sumw=0,sumt=0;
 int wt=0;
 int x = 0;
 float avgwt=0.0,avgta=0.0;
-
+int opcion=1;
  
 typedef struct proceso {
 	int pid;
@@ -61,6 +61,20 @@ void display(){
 		printf("\033[0;31m");
 		printf("[%d]", temp->pid);
 		printf("\033[0m;");
+		temp = temp->anterior;
+	}
+	printf("\n");
+}
+void display_ejecutados(){
+	if(is_empty_ejec()){
+		printf("\nCola ejecutados vacia!\n");
+		return;
+	}
+	proceso_ptr temp = proc_ejecutados_front;
+	printf("\nCola ejecutado\n Procesos: ");
+	while(temp != NULL){
+		//printf("- [%d], [%d], [%d] -", temp->pid,temp->burst,temp->priority);
+		printf("[%d]", temp->pid);
 		temp = temp->anterior;
 	}
 	printf("\n");
@@ -211,20 +225,7 @@ proceso_ptr pop_index(int index)
 }
 
  
-void display_ejecutados(){
-	if(is_empty_ejec()){
-		printf("\nCola ejecutados vacia!\n");
-		return;
-	}
-	proceso_ptr temp = proc_ejecutados_front;
-	printf("\nCola ejecutado\n Procesos: ");
-	while(temp != NULL){
-		//printf("- [%d], [%d], [%d] -", temp->pid,temp->burst,temp->priority);
-		printf("[%d]", temp->pid);
-		temp = temp->anterior;
-	}
-	printf("\n");
-}
+
 
 int cola_size(){
 	int n =0;
@@ -486,7 +487,7 @@ void *job_scheduler(void * sockfd){
 			bzero(str, sizeof(str)); 
 			write(sockfd, respuesta, sizeof(respuesta)); 
 			bzero(respuesta, sizeof(respuesta)); 
-
+			printf("\nbusst %d, priori %d\n",int_burst,int_priority);
 			temp_proccess->pid= pid;
 			temp_proccess->burst= int_burst;
 			temp_proccess->priority= int_priority;
@@ -576,7 +577,9 @@ void* verificar_cola(){
 			display_ejecutados();
 		}
 		else if(n==7){
-			break;
+			opcion=0;
+			pthread_exit(0);
+			// break;
 		}
 	}
 }

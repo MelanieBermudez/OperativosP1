@@ -27,7 +27,12 @@ void* verificar_cola(){
 		if(opt==0){
 			printf("es 0");
 			cancel=0;
-			pthread_exit(0);
+			// pthread_exit(0);
+		}
+		if(opt==1){
+			printf("Hola esto no jace nada");
+			// cancel=0;
+			// pthread_exit(0);
 		}
 	}
 }
@@ -83,13 +88,15 @@ void func(int sockfd, int modo,int rangomin,int rangomax,int tasa)
 		int n=0;
 
 		while(cancel!=0){
-			burst = rand() % (rangomax + 1-rangomin)+rangomin;
+
+			burst = rand() % (rangomax + 1-rangomin) + rangomin;
 			prioridad = rand() % (rangomax + 1-rangomin)+rangomin;
 			bzero(buff, sizeof(buff)); 
 			buff[0]=burst+'0';
 			buff[1]=' ';
 			buff[2]=prioridad+'0';
 			buff[3]='\0';
+			printf("buff%s",buff);
 			SendThread * args = malloc(sizeof *args);
 			args ->socketfd = &sockfd;
 			args ->buffer = &buff;
@@ -108,6 +115,7 @@ void func(int sockfd, int modo,int rangomin,int rangomax,int tasa)
 
 int main() 
 { 
+	srand (time(NULL));
 	int sockfd, connfd; 
 	struct sockaddr_in servaddr, cli; 
 	// socket create and varification 
