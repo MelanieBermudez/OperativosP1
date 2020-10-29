@@ -81,6 +81,7 @@ void func(int sockfd, int modo,int rangomin,int rangomax,int tasa)
 		char buff[MAX]; 
 		char buffa[MAX] = "PROCESO ENVIADO";
 		int n=0;
+
 		while(cancel!=0){
 			burst = rand() % (rangomax + 1-rangomin)+rangomin;
 			prioridad = rand() % (rangomax + 1-rangomin)+rangomin;
