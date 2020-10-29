@@ -191,7 +191,7 @@ proceso_ptr pop()
 	return temp;
 
 }
-proceso_ptr pop(int index)
+proceso_ptr pop_index(int index)
 {	
 
 	int size= cola_size();
@@ -199,18 +199,19 @@ proceso_ptr pop(int index)
 	
 	proceso_ptr temp = front;
 	
-	while(cont<index){
+	while(temp->anterior!=NULL)
+	{
 
+		if(temp->pid != index){
+			push(temp);
+		}
 		temp= temp->anterior;
-		cont++;
-
 	}
-	proceso_ptr aux = temp;
-	
-	front = front->anterior;p
+
 	return temp;
 
 }
+
  
 
 
@@ -321,6 +322,9 @@ void SJF(){
 		temp_proccess2= pop();
 		printf("\nProceso ejecutado terminado: %d \n", temp_proccess2->pid);
 		push_ejecutados(*temp_proccess2);
+
+
+		
 		printf("\n\n PROC.\tB.T.\tW.T\tT.A.T");
 		proceso_ptr temp1 = proc_ejecutados_front;
 		while(temp1->anterior != NULL){
@@ -379,14 +383,9 @@ void RR(){
 		}
 		// printf("Ejecutando proceso: %d Burst: %d Prioridad: %d \n", temp->pid ,temp->burst, temp->priority );
 		// sleep(temp->burst);
-
-
 		while(temp->burst > 0){
-
 			if( temp->burst >= quantum){
-
 				int resta= temp->burst- quantum;
-
 				temp->wt = wt; 
 				temp->ta =  temp->wt + quantum;
 				cant_cola--;
