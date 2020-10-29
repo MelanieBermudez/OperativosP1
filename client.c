@@ -40,19 +40,15 @@ void func(int sockfd, int modo,int rangomin,int rangomax,int tasa)
 	if(modo==1) {
 		char buff[MAX]; 
 		char buffa[MAX] = "PROCESO ENVIADO";
-
 		int n; 
 		FILE *fp;
-		
 		char* filename= "procesos.txt";
 		int burst, prioridad;
-	
 		fp = fopen(filename,"r");
 		if (fp==NULL){
 			printf("Could not open file %s", filename);
 		}
 			while(fgets(buff,MAX,fp)!= NULL){
-
 			SendThread * args = malloc(sizeof *args);
 			args ->socketfd = &sockfd;
 			args ->buffer = &buff;
@@ -66,34 +62,28 @@ void func(int sockfd, int modo,int rangomin,int rangomax,int tasa)
 			fclose(fp); 
 	}
 	else{
-		int pid=0;
 		int burst;
 		int prioridad;
 		char buff[MAX]; 
+		char buffa[MAX] = "PROCESO ENVIADO";
 		int n; 
 
 		for(;;){
 			burst = rand() % (rangomax + 1-rangomin)+rangomin;
 			prioridad = rand() % (rangomax + 1-rangomin)+rangomin;
-			pid++;
-			printf("%PID %d\n",pid);
-			printf("%BURST %d\n",burst);
-			printf("%PRIORIDAD %d\n",prioridad);
-			sleep(2);
-
 			bzero(buff, sizeof(buff)); 
-			buff[0]=pid+'0';
+			buff[0]=burst+'0';
 			buff[1]=' ';
-			buff[2]=burst+'0';
-			buff[3]=' ';
-			buff[4]=prioridad+'0';
-			buff[5]='\0';
-			write(sockfd, buff, sizeof(buff)); 
-			bzero(buff, sizeof(buff)); 
-				
-			read(sockfd, buff, sizeof(buff)); 
-			printf("\nFrom Server : %s\n", buff); 
-			sleep(tasa);
+			buff[2]=prioridad+'0';
+			buff[3]='\0';
+			SendThread * args = malloc(sizeof *args);
+			args ->socketfd = &sockfd;
+			args ->buffer = &buff;
+			pthread_t thread_send;
+			pthread_create(&thread_send,NULL,send_thread, args);
+			sleep(sleep_rand);
+			pthread_join(thread_send,NULL);
+			int pthread_cancel(pthread_t thread_send);
 		}
 	}
 }
