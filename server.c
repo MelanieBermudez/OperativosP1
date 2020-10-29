@@ -61,7 +61,7 @@ void push(struct proceso p)
 	item->ejecutado=p.ejecutado;
 	item->estado=p.estado;
 	item->ta=p.ta;
-	item->wt=p.wt;
+	item->wt=p.wt; 
 	//item->anterior=NULL;
 	if(rear == NULL)
 		front = rear = item;
