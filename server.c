@@ -142,7 +142,6 @@ void push_hpf(struct proceso p){
 	}
 }
 	
-
 void push_sjf(struct proceso p){
 
 	proceso_ptr item = (proceso_ptr) malloc(sizeof(struct proceso));
@@ -212,8 +211,6 @@ proceso_ptr pop_index(int index)
 }
 
  
-
-
 void display_ejecutados(){
 	if(is_empty_ejec()){
 		printf("\nCola ejecutados vacia!\n");

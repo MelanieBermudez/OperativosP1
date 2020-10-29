@@ -19,6 +19,17 @@ char *buffer;
 char *msg[MAX];
  }SendThread;
 
+void* verificar_cola(){
+	int cancel;
+	for(;;){
+		scanf("%d", &cancel);
+		if(cancel==0){
+			pthread_exit(0);
+		}
+	}
+}
+ 			
+
 void *send_thread(void *args){
 
 	SendThread *actual_args = args;
@@ -34,6 +45,7 @@ void *send_thread(void *args){
 	printf("\nFrom Server : %s \n", buff); 
 	pthread_exit(0);	
 }
+
 void func(int sockfd, int modo,int rangomin,int rangomax,int tasa) 
 { 
 	int sleep_rand = rand() % (8 + 1-3)+3;
@@ -67,6 +79,7 @@ void func(int sockfd, int modo,int rangomin,int rangomax,int tasa)
 		char buff[MAX]; 
 		char buffa[MAX] = "PROCESO ENVIADO";
 		int n; 
+		
 
 		for(;;){
 			burst = rand() % (rangomax + 1-rangomin)+rangomin;
@@ -134,11 +147,11 @@ int main()
 		scanf("%d", &rangomax);
 		printf("\nIndique la tasa de creacion de procesos : ");
 		scanf("%d", &tasa);
+		printf("\n Para terminar de ejecutar presione: 0 \n");
 
 		func(sockfd,modo,rangomin,rangomax,tasa);
 		return 0;
 	}
-	
 	// close the socket 
 	// close(sockfd); 
 } 
