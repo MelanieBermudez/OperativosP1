@@ -20,6 +20,7 @@ char *msg[MAX];
  }SendThread;
 
 void *send_thread(void *args){
+
 	SendThread *actual_args = args;
 	char buff[MAX] = "PROCESO ENVIADO";
 	// free(actual_args);
@@ -57,8 +58,7 @@ void func(int sockfd, int modo,int rangomin,int rangomax,int tasa)
 			args ->buffer = &buff;
 			pthread_t thread_send;
 			pthread_create(&thread_send,NULL,send_thread, args);
-			// sleep(sleep_rand);
-			sleep(3);
+			sleep(sleep_rand);
 			pthread_join(thread_send,NULL);
 			int pthread_cancel(pthread_t thread_send);
 			
@@ -96,43 +96,6 @@ void func(int sockfd, int modo,int rangomin,int rangomax,int tasa)
 			sleep(tasa);
 		}
 	}
-}
-
-void* myThreadRead(void *arg){
-	char buff[MAX]; 
-	int n; 
-	FILE *fp;
-	char* filename= "procesos.txt";
-    int burst, prioridad;
-	int *sockfd = (int*)arg;
-
-	fp = fopen(filename,"r");
-	if (fp==NULL){
-		printf("Could not open file %s", filename);
-	}	 
-	while(fgets(buff,MAX,fp)!= NULL){
-		printf("buff %s", buff);
-		sleep(2);
-
-		write(*sockfd, buff, sizeof(buff)); 
-		bzero(buff, sizeof(buff)); 
-		read(*sockfd, buff, sizeof(buff)); 
-		printf("\nFrom Server : %s", buff); 
-		sleep(5);
-	}
-	fclose(fp);    
-	return NULL;
-}
-void* myThreadQueu(void *arg){
-	while(1){
-	printf("prubea\n");
-	scanf("%d", &modo);
-	if(modo==1){
-		printf("modo   %d",modo);
-	}
-	sleep(6);
-	}
-	return NULL;
 }
 
 
