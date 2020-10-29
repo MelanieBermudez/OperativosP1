@@ -31,7 +31,6 @@ typedef struct proceso {
 	bool estado;
 	int ejecutado;
 	int wt,ta;
-	int flag;
 	struct proceso *anterior;
 
  }*proceso_ptr;
@@ -187,11 +186,11 @@ void push_rr(struct proceso p){}
 proceso_ptr pop()
 {
 	proceso_ptr temp = front;
-	front = front->anterior;p
+	front = front->anterior;
 	return temp;
 
 }
-proceso_ptr pop(int index)
+proceso_ptr pop_index(int index)
 {	
 
 	int size= cola_size();
@@ -199,18 +198,19 @@ proceso_ptr pop(int index)
 	
 	proceso_ptr temp = front;
 	
-	while(cont<index){
+	while(temp->anterior!=NULL)
+	{
 
+		if(temp->pid != index){
+			push(*temp);
+		}
 		temp= temp->anterior;
-		cont++;
-
 	}
-	proceso_ptr aux = temp;
-	
-	front = front->anterior;p
+
 	return temp;
 
 }
+
  
 
 
@@ -331,7 +331,6 @@ void SJF(){
 	}
 }
 void RR(){
-	
 	int cant_cola = cola_size();
 	int n = 0;
 	n = procesos_cola;
@@ -339,11 +338,8 @@ void RR(){
 	sleep(5);
 	if(cant_cola!=0){
 		while(temp->anterior != NULL){
-			
 			printf("PROCESP%d\n",temp->pid);
-
 			if(temp->burst <= quantum){
-				
 				printf("mayor%d",temp->burst);
 				temp->wt = wt; //ta del temp-1 o la suma de los burst que ya se ejecutaron
 				temp->ta = temp->wt+temp->burst;
@@ -354,10 +350,8 @@ void RR(){
 				sleep(temp->burst);
 				proceso_ptr temp_proccess2 = (proceso_ptr) malloc(sizeof (struct proceso));
 				temp_proccess2= pop();
-				temp_proccess2->ejecutado= true;
+				temp_proccess2->estado= true;
 				push_ejecutados(*temp);
-
-
 			}else{
 					
 				int resta= temp->burst- quantum;
@@ -371,53 +365,49 @@ void RR(){
 				sleep(quantum);
 				temp->burst= resta;
 				printf("temp->burst%d",temp->burst);
-
-
+				proceso_ptr temp_proccess2 = (proceso_ptr) malloc(sizeof (struct proceso));
+				temp_proccess2= pop();
+				temp_proccess2->estado= false;
+				push(*temp);
 			}		
-			temp = temp->anterior;
-					
+			temp = temp->anterior;			
 		}
-		// printf("Ejecutando proceso: %d Burst: %d Prioridad: %d \n", temp->pid ,temp->burst, temp->priority );
-		// sleep(temp->burst);
-
-
+		printf("\n burst temp antes del while %d", temp->burst);
 		while(temp->burst > 0){
+			printf("\nultimo proceso %d  \n", temp->burst);
 
 			if( temp->burst >= quantum){
-
+				printf("\nultimo proceso en el if %d  \n", temp->burst);
 				int resta= temp->burst- quantum;
-
 				temp->wt = wt; 
 				temp->ta =  temp->wt + quantum;
 				cant_cola--;
 				temp->burst= resta;
-				printf("\nEjecutadno proceso con %d quatum %d  \n", temp->pid,quantum);
-
-
+				printf("\nEjecutadno proceso con %d burst  %d  \n", temp->pid,temp->burst);
 			}else{
+				int resta= temp->burst- quantum;
+				printf("\n else ultimo ultimo burst %d  \n",temp->burst);
 				temp->wt = wt; //ta del temp-1 o la suma de los burst que ya se ejecutaron
 				temp->ta = temp->wt+temp->burst;
 				sumw+= wt;
 				sumt+=temp->ta;
 				wt+= temp->burst;
+				temp->burst= 0;
 				printf("\nProceso ejecutado terminado: %d \n", temp->pid);
+				proceso_ptr temp_proccess2 = (proceso_ptr) malloc(sizeof (struct proceso));
+				temp_proccess2= pop();
+				//sleep(4);
+				temp_proccess2->estado= true;
+				push_ejecutados(*temp);
 			}
 		}
-			proceso_ptr temp_proccess2 = (proceso_ptr) malloc(sizeof (struct proceso));
-			temp_proccess2= pop();
-			printf("\nProceso ejecutado terminado: %d \n", temp_proccess2->pid);
-			temp_proccess2->ejecutado= true;
-			push_ejecutados(*temp);
-
-
-
 		proceso_ptr temp1 = proc_ejecutados_front;
 		printf("\n\n PROC.\tB.T.\tW.T\tT.A.T");
 		while(temp1->anterior != NULL){
-			printf("\n %d\t%d\t%d\t%d",temp1->pid,temp1->burst,temp1->wt,temp1->ta);
+			printf("\n %d\t%d\t%d\t%d",temp1->pid,temp1->ejecutado,temp1->wt,temp1->ta);
 			temp1 = temp1->anterior;
 		}
-		printf("\n %d\t%d\t%d\t%d",temp1->pid,temp1->burst,temp1->wt,temp1->ta);
+		printf("\n %d\t%d\t%d\t%d",temp1->pid,temp1->ejecutado,temp1->wt,temp1->ta);
 	}
 }
 
@@ -502,7 +492,7 @@ void *job_scheduler(void * sockfd){
 			temp_proccess->priority= int_priority;
 			temp_proccess->anterior= NULL;
 			temp_proccess->estado=false;
-			temp_proccess->ejecutado=0;
+			temp_proccess->ejecutado=int_burst;
 			procesos_cola++;
 			cant_procesos++;
 
