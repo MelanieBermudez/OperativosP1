@@ -81,7 +81,8 @@ void func(int sockfd, int modo,int rangomin,int rangomax,int tasa)
 		char buff[MAX]; 
 		char buffa[MAX] = "PROCESO ENVIADO";
 		int n=0;
-		while(cancel!=0){
+		while(cancel !=0 ){
+			printf(" cancel %d",cancel);
 			burst = rand() % (rangomax + 1-rangomin)+rangomin;
 			prioridad = rand() % (rangomax + 1-rangomin)+rangomin;
 			bzero(buff, sizeof(buff)); 
@@ -155,10 +156,10 @@ int main()
 		func(sockfd,modo,rangomin,rangomax,tasa);
 		return 0;
 	}
-	pthread_t cola_thread;
-	pthread_create(&cola_thread,NULL,verificar_cola ,NULL);
+		pthread_t cola_thread;
+		pthread_create(&cola_thread,NULL,verificar_cola ,NULL);
 
-	pthread_join(cola_thread,NULL);
+		pthread_join(cola_thread,NULL);
 	// close the socket 
 	// close(sockfd); 
 } 
