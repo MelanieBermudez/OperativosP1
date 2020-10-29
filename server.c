@@ -60,7 +60,7 @@ void display(){
 	printf("\n Cola Ready \n Procesos:  ");
 	while(temp != NULL){
 		printf("\033[0;31m");
-		printf("[%d]", temp->pid);
+		printf("[%d]", temp->priority);
 		printf("\033[0m;");
 		temp = temp->anterior;
 	}
@@ -114,47 +114,74 @@ void push_hpf(struct proceso p){
 	item->estado=p.estado;
 	item->ta=p.ta;
 	item->wt=p.wt;
-	printf("Push item priority: %d\n", item->priority);
-	if(rear == NULL){
-		printf("dentro del if rear=item \n");
+	if(front == NULL){
 		front = rear = item;
-	}else{
-		printf("dentro del else temp=front\n");
-		proceso_ptr temp= front;
-		while(temp->anterior!=NULL){
-			//display();
-			printf("Proceso temp prioridad: %d\n", temp->priority);
-			printf("item-prioridad < tempo-anterior-prioridad %d  %d\n", item->priority, temp->anterior->priority);
-			if(item->priority < temp->anterior->priority){
-				printf("dentro del if  %d\n");
-				item->anterior=temp->anterior;
+	}
+	else
+	{
+		if(item->priority < front->priority){
+			item->anterior=front;
+			front=item;
+		}
+		else
+		{
+			proceso_ptr temp= front;
+			proceso_ptr atras= front;
+			while(item->priority > temp->priority && temp->anterior !=NULL){
+				atras=temp;
+				temp=temp->anterior; 
+			}
+			if(item->priority > temp->priority){
 				temp->anterior=item;
 			}
-			temp=temp->anterior;
+			else{
+				item->anterior=temp;
+				atras->anterior= item;
+			}
+			
 		}
-		printf("sale del while \n");
-		if(item->priority < temp->priority){
-			item->anterior=temp;
-			temp->anterior=item;
-		}else{
-			temp->anterior=item;
-		}
-
-	// 	printf("Proceso aux prioridad: %d\n", aux->priority);
-	// 	if(item->priority < aux->priority){
-	// 		printf("dentro del if");
-	// 		aux= item;
-	// 		item = item->anterior;
-	// 		item->anterior = aux;
-	// 	}else{
-	// 		rear->anterior = item;
-	// 		rear = item;
-
-		}	
+	}
 }
 	
 
-void push_sjf(struct proceso p){}
+void push_sjf(struct proceso p){
+
+	proceso_ptr item = (proceso_ptr) malloc(sizeof(struct proceso));
+	item->pid=p.pid;
+	item->burst=p.burst;
+	item->priority=p.priority;
+	item->ejecutado=p.ejecutado;
+	item->estado=p.estado;
+	item->ta=p.ta;
+	item->wt=p.wt;
+	if(front == NULL){
+		front = rear = item;
+	}
+	else
+	{
+		if(item->burst < front->burst){
+			item->anterior=front;
+			front=item;
+		}
+		else
+		{
+			proceso_ptr temp= front;
+			proceso_ptr atras= front;
+			while(item->burst > temp->burst && temp->anterior !=NULL){
+				atras=temp;
+				temp=temp->anterior; 
+			}
+			if(item->burst > temp->burst){
+				temp->anterior=item;
+			}
+			else{
+				item->anterior=temp;
+				atras->anterior= item;
+			}
+			
+		}
+	}
+}
 void push_rr(struct proceso p){}
 proceso_ptr pop()
 {
@@ -199,44 +226,6 @@ void HPF()
 	int cant_cola = cola_size();
 	int n = 0;
 	n = procesos_cola;
-	int sumw=0,sumt=0;
-	float avgwt=0.0,avgta=0.0;
-	int i,j;
-	int x = 0;
-	// proceso_ptr temp = front;
-	// proceso_ptr t;
-	// sleep(5);
-	// if(cant_cola!=0){
-	// 	while(temp->anterior!=NULL){
-	// 		proceso_ptr aux = temp->anterior;
-	// 		//temp es 
-	// 		if (temp->anterior->priority < temp->priority){
-	// 			aux = temp;
-	// 			temp = temp->anterior;
-	// 			temp->anterior= aux;
-	// 		}
-	// 		temp = temp->anterior;
-	// 	}
-	// }
-}
-void SJF(){
-	int sumw=0,sumt=0;
-	int x = 0;
-	float avgwt=0.0,avgta=0.0;
-	int i,j;
-}
-void RR(){
-	int pflag=0,t,tcurr=0,k,i,Q=0;
-	int sumw=0,sumt=0;
-	float avgwt=0.0,avgta=0.0;
-}
-
-void FCFS(){
-
-
-	int cant_cola = cola_size();
-	int n = 0;
-	n = procesos_cola;
 	proceso_ptr temp = front;
 	sleep(5);
 	if(cant_cola!=0){
@@ -267,6 +256,49 @@ void FCFS(){
 
 
 		
+		printf("\n\n PROC.\tB.T.\tW.T\tT.A.T\tPrioridad");
+		proceso_ptr temp1 = proc_ejecutados_front;
+		while(temp1->anterior != NULL){
+			printf("\n %d\t%d\t%d\t%d",temp1->pid,temp1->burst,temp1->wt,temp1->ta,temp1->priority);
+			temp1 = temp1->anterior;
+		}
+		printf("\n %d\t%d\t%d\t%d",temp1->pid,temp1->burst,temp1->wt,temp1->ta,temp1->priority);
+		
+	}
+
+
+
+}
+void SJF(){
+	int cant_cola = cola_size();
+	int n = 0;
+	n = procesos_cola;
+	proceso_ptr temp = front;
+	sleep(5);
+	if(cant_cola!=0){
+		while(temp->anterior != NULL){
+			temp->wt = wt; //ta del temp-1 o la suma de los burst que ya se ejecutaron
+			temp->ta = temp->wt+temp->burst;
+			sumw+= wt;
+			sumt+=temp->ta;
+			wt+= temp->burst;
+			printf("\nEjecutando proceso: %d Burst: %d Prioridad: %d \n", temp->pid ,temp->burst, temp->priority );
+			sleep(temp->burst);
+			temp = temp->anterior;
+			proceso_ptr temp_proccess2 = (proceso_ptr) malloc(sizeof (struct proceso));
+			temp_proccess2= pop();
+			printf("Proceso ejecutado terminado:  %d\n", temp_proccess2->pid);
+			push_ejecutados(*temp_proccess2);
+		}
+		printf("Ejecutando proceso: %d Burst: %d Prioridad: %d \n", temp->pid ,temp->burst, temp->priority );
+		sleep(temp->burst);
+		temp->wt = wt; 
+		temp->ta =  temp->wt +  temp->burst;
+		cant_cola--;
+		proceso_ptr temp_proccess2 = (proceso_ptr) malloc(sizeof (struct proceso));
+		temp_proccess2= pop();
+		printf("\nProceso ejecutado terminado: %d \n", temp_proccess2->pid);
+		push_ejecutados(*temp_proccess2);
 		printf("\n\n PROC.\tB.T.\tW.T\tT.A.T");
 		proceso_ptr temp1 = proc_ejecutados_front;
 		while(temp1->anterior != NULL){
@@ -274,12 +306,55 @@ void FCFS(){
 			temp1 = temp1->anterior;
 		}
 		printf("\n %d\t%d\t%d\t%d",temp1->pid,temp1->burst,temp1->wt,temp1->ta);
-		
+	}
+}
+void RR(){
+	int pflag=0,t,tcurr=0,k,i,Q=0;
+	int sumw=0,sumt=0;
+	float avgwt=0.0,avgta=0.0;
+}
+
+void FCFS(){
+	int cant_cola = cola_size();
+	int n = 0;
+	n = procesos_cola;
+	proceso_ptr temp = front;
+	sleep(5);
+	if(cant_cola!=0){
+		while(temp->anterior != NULL){
+			temp->wt = wt; //ta del temp-1 o la suma de los burst que ya se ejecutaron
+			temp->ta = temp->wt+temp->burst;
+			sumw+= wt;
+			sumt+=temp->ta;
+			wt+= temp->burst;
+			printf("\nEjecutando proceso: %d Burst: %d Prioridad: %d \n", temp->pid ,temp->burst, temp->priority );
+			sleep(temp->burst);
+			temp = temp->anterior;
+			proceso_ptr temp_proccess2 = (proceso_ptr) malloc(sizeof (struct proceso));
+			temp_proccess2= pop();
+			printf("Proceso ejecutado terminado:  %d\n", temp_proccess2->pid);
+			push_ejecutados(*temp_proccess2);
+		}
+		printf("Ejecutando proceso: %d Burst: %d Prioridad: %d \n", temp->pid ,temp->burst, temp->priority );
+		sleep(temp->burst);
+		temp->wt = wt; 
+		temp->ta =  temp->wt +  temp->burst;
+		cant_cola--;
+		proceso_ptr temp_proccess2 = (proceso_ptr) malloc(sizeof (struct proceso));
+		temp_proccess2= pop();
+		printf("\nProceso ejecutado terminado: %d \n", temp_proccess2->pid);
+		push_ejecutados(*temp_proccess2);
+		printf("\n\n PROC.\tB.T.\tW.T\tT.A.T");
+		proceso_ptr temp1 = proc_ejecutados_front;
+		while(temp1->anterior != NULL){
+			printf("\n %d\t%d\t%d\t%d",temp1->pid,temp1->burst,temp1->wt,temp1->ta);
+			temp1 = temp1->anterior;
+		}
+		printf("\n %d\t%d\t%d\t%d",temp1->pid,temp1->burst,temp1->wt,temp1->ta);
 	}
 }
 
 void *job_scheduler(void * sockfd){
-	printf("ALGORITMO JOB SCH %d", algoritmo);
 	char buff[MAX]; 
 	char str;
 	int pid=0;
@@ -307,7 +382,6 @@ void *job_scheduler(void * sockfd){
 			int int_priority=0;
 			int_burst =	 *temp - '0';
 			int_priority = *char_priority - '0';
-
 			proceso_ptr temp_proccess = (proceso_ptr) malloc(sizeof (struct proceso));
 			pid++;
 			str[0]= pid+'0';
@@ -337,7 +411,9 @@ void *job_scheduler(void * sockfd){
 			else if(algoritmo ==4){
 				push(*temp_proccess);
 			}
+
 		}
+		// display();
 		//NO BORRAR : CODIGO DE POP
 			// pthread_exit(0);
 	} 
@@ -359,20 +435,35 @@ void *cpu_scheduler(void *algoritmo){
 			}
 		}
 		else if (algoritmo ==2){
-			// if(is_empty()){
-			// 	int a =1;
-			// 	//printf("\nThe queue is empty!\n");
-			// }else{
-			// 	HPF();
-			// }
+			if(is_empty()){
+				int a =1;
+			}else{
+				HPF();
+			}
 		}
 		else if (algoritmo ==3){
-			printf("HPF");
+			if(is_empty()){
+				int a =1;
+			}else{
+				SJF();
+			}
 		}
 		else if (algoritmo ==4){
-			printf("Round Robin");
-			printf("\nIngrese el quantum: ");
-			scanf("%d", &quantum);
+
+
+			if(is_empty()){
+			int a =1;
+				//printf("\nThe queue is empty!\n");
+			}else{
+				FCFS();
+				//display_ejecutados();
+				avgwt = (float)sumw/cant_procesos;
+				avgta = (float)sumt/cant_procesos;
+				printf("\n\n Average waiting time = %0.2f - Average turn-around = %0.2f.",avgwt,avgta);
+			}
+
+
+
 		}
 	}
 	
@@ -384,10 +475,10 @@ void* verificar_cola(){
 		if(n==5){
 			display();
 		}
-		else if(n==7){
+		else if(n==6){
 			display_ejecutados();
 		}
-		else if(n==6){
+		else if(n==7){
 			break;
 		}
 	}
@@ -435,13 +526,20 @@ int main()
 	
 	printf("---------- Menu de opciones ---------- ");
     printf("\n 1. FIFO ");
-    printf("\n 2. SJF ");
-    printf("\n 3. HPF ");
+    printf("\n 2. HPF ");
+    printf("\n 3. SJF ");
     printf("\n 4. ROUND ROBIN");
-	printf("\n 5. Verificar la cola\n");
-	printf("\n 6. Terminar la ejecucion\n");
+	printf("\n 5. Verificar la cola del ready\n");
+	printf("\n 6. Verificar la cola de procesados\n");
+	printf("\n 7. Terminar la ejecucion\n");
 	
 	scanf("%d", &algoritmo);
+
+	if(algoritmo==4){
+		printf("Round Robin");
+		printf("\nIngrese el quantum: ");
+		scanf("%d", &quantum);
+	}
 
 	pthread_t job_scheduler_thread;
 	pthread_t cpu_scheduler_thread;
