@@ -55,6 +55,8 @@ void push(struct proceso p)
 	item->priority=p.priority;
 	item->ejecutado=p.ejecutado;
 	item->estado=p.estado;
+	item->ta=p.ta;
+	item->wt=p.wt;
 	//item->anterior=NULL;
 	if(rear == NULL)
 		front = rear = item;
@@ -72,6 +74,8 @@ void push_ejecutados(struct proceso p)
 	item->priority=p.priority;
 	item->ejecutado=p.ejecutado;
 	item->estado=p.estado;
+	item->ta=p.ta;
+	item->wt=p.wt;
 	//item->anterior=NULL;
 	if(proc_ejecutados_rear == NULL)
 		proc_ejecutados_front = proc_ejecutados_rear = item;
@@ -92,18 +96,18 @@ void display(){
 
 	if(is_empty()){
 
-		printf("\nThe queue is empty!\n");
+		printf("\nCola Ready Vacia\n");
 		return;
 	}
 	proceso_ptr temp = front;
-	printf("\n[front -> ");
+	printf("\n Cola Ready \n Procesos:  ");
 
 	while(temp != NULL){
 		//printf("- [%d], [%d], [%d] -", temp->pid,temp->burst,temp->priority);
 		printf("[%d]", temp->pid);
 		temp = temp->anterior;
 	}
-	printf(" <- rear]\n");
+	printf("\n");
 
 }
 void display_ejecutados(){
@@ -114,15 +118,14 @@ void display_ejecutados(){
 		return;
 	}
 	proceso_ptr temp = proc_ejecutados_front;
-	printf("\n[f ejecutado-> ");
+	printf("\nCola ejecutado\n Procesos: ");
 
 	while(temp != NULL){
 		//printf("- [%d], [%d], [%d] -", temp->pid,temp->burst,temp->priority);
 		printf("[%d]", temp->pid);
-		printf("[%d]", temp->wt);
 		temp = temp->anterior;
 	}
-	printf(" <- r ejecutado]\n");
+	printf("\n");
 
 }
 int cola_size(){
@@ -243,27 +246,32 @@ void FCFS(){
 				sumw+= wt;
 				sumt+=temp->ta;
 				wt+= temp->burst;
+				printf("\nEjecutando proceso: %d Burst: %d Prioridad: %d \n", temp->pid ,temp->burst, temp->priority );
 				sleep(temp->burst);
 				temp = temp->anterior;
 				proceso_ptr temp_proccess2 = (proceso_ptr) malloc(sizeof (struct proceso));
 				temp_proccess2= pop();
-				printf("temp burst: %d - ta:%d", temp_proccess2->burst, temp_proccess2->ta );
+				// printf("------------------------------------------------ \n" );
+				printf("Proceso ejecutado terminado:  %d\n", temp_proccess2->pid);
 				push_ejecutados(*temp_proccess2);
 			}
+		// printf("------------------------------------------------ \n" );
+		printf("\nEjecutando proceso: %d Burst: %d Prioridad: %d \n", temp->pid ,temp->burst, temp->priority );
 		sleep(temp->burst);
 		//proc_ejecutados_front->anterior;
 		temp->wt = wt; //(temp->anterior->ta); //ta del temp-1 o la sumw de los burst que ya se ejecutaron
 		temp->ta =  temp->wt +  temp->burst;
-		sumt+=temp->ta;
+		// sumt+=temp->ta;
 		cant_cola--;
 
 		proceso_ptr temp_proccess2 = (proceso_ptr) malloc(sizeof (struct proceso));
 		temp_proccess2= pop();
+		printf("Proceso ejecutado terminado: %d \n", temp_proccess2->pid);
 		push_ejecutados(*temp_proccess2);
 
 		avgwt = (float)sumw/cant_procesos;
 		avgta = (float)sumt/cant_procesos;
-		display_ejecutados();
+		// display_ejecutados();
 		printf("\n\n PROC.\tB.T.\tW.T\tT.A.T");
 		proceso_ptr temp1 = proc_ejecutados_front;
 		while(temp1->anterior != NULL){
@@ -292,7 +300,7 @@ void *job_scheduler(void * sockfd){
 		bzero(buff, MAX); 
 		read(sockfd, buff, sizeof(buff)); 
 		char str[MAX];
-		printf("servidor recibe:  %s\n", buff);
+		printf("\nRecibiendo proceso:  %s\n", buff);
 		char *temp = strtok(buff," ");		
 		// if(strlen(buff)==0){
 		if(strlen(buff)==0){
@@ -377,7 +385,7 @@ void* verificar_cola(){
 			display();
 		}
 		else if(n==7){
-			FCFS();
+			display_ejecutados();
 		}
 		else if(n==6){
 			break;
