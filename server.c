@@ -51,6 +51,21 @@ bool is_empty_ejec(){
 	return (proc_ejecutados_front == NULL);
 }
 
+void display(){
+	if(is_empty()){
+		printf("\nCola Ready Vacia\n");
+		return;
+	}
+	proceso_ptr temp = front;
+	printf("\n Cola Ready \n Procesos:  ");
+	while(temp != NULL){
+		printf("\033[0;31m");
+		printf("[%d]", temp->pid);
+		printf("\033[0m;");
+		temp = temp->anterior;
+	}
+	printf("\n");
+}
 void push(struct proceso p)
 {
 	//printf("Push: %d, %d, %d", p.pid, p.burst,p.priority);
@@ -89,6 +104,58 @@ void push_ejecutados(struct proceso p)
 		proc_ejecutados_rear = item;
 	}
 }
+void push_hpf(struct proceso p){
+	
+	proceso_ptr item = (proceso_ptr) malloc(sizeof(struct proceso));
+	item->pid=p.pid;
+	item->burst=p.burst;
+	item->priority=p.priority;
+	item->ejecutado=p.ejecutado;
+	item->estado=p.estado;
+	item->ta=p.ta;
+	item->wt=p.wt;
+	printf("Push item priority: %d\n", item->priority);
+	if(rear == NULL){
+		printf("dentro del if rear=item \n");
+		front = rear = item;
+	}else{
+		printf("dentro del else temp=front\n");
+		proceso_ptr temp= front;
+		while(temp->anterior!=NULL){
+			//display();
+			printf("Proceso temp prioridad: %d\n", temp->priority);
+			printf("item-prioridad < tempo-anterior-prioridad %d  %d\n", item->priority, temp->anterior->priority);
+			if(item->priority < temp->anterior->priority){
+				printf("dentro del if  %d\n");
+				item->anterior=temp->anterior;
+				temp->anterior=item;
+			}
+			temp=temp->anterior;
+		}
+		printf("sale del while \n");
+		if(item->priority < temp->priority){
+			item->anterior=temp;
+			temp->anterior=item;
+		}else{
+			temp->anterior=item;
+		}
+
+	// 	printf("Proceso aux prioridad: %d\n", aux->priority);
+	// 	if(item->priority < aux->priority){
+	// 		printf("dentro del if");
+	// 		aux= item;
+	// 		item = item->anterior;
+	// 		item->anterior = aux;
+	// 	}else{
+	// 		rear->anterior = item;
+	// 		rear = item;
+
+		}	
+}
+	
+
+void push_sjf(struct proceso p){}
+void push_rr(struct proceso p){}
 proceso_ptr pop()
 {
 	proceso_ptr temp = front;
@@ -97,19 +164,6 @@ proceso_ptr pop()
 
 }
  
-void display(){
-	if(is_empty()){
-		printf("\nCola Ready Vacia\n");
-		return;
-	}
-	proceso_ptr temp = front;
-	printf("\n Cola Ready \n Procesos:  ");
-	while(temp != NULL){
-		printf("[%d]", temp->pid);
-		temp = temp->anterior;
-	}
-	printf("\n");
-}
 
 void display_ejecutados(){
 	if(is_empty_ejec()){
@@ -140,8 +194,6 @@ int cola_size(){
 	return n;
 }
 
-
-
 void HPF()
 {
 	int cant_cola = cola_size();
@@ -151,47 +203,21 @@ void HPF()
 	float avgwt=0.0,avgta=0.0;
 	int i,j;
 	int x = 0;
-	proceso_ptr temp = front;
-	proceso_ptr t;
-		for(i=2;i<n;i++)
-		for(j=1;j<n-i+1;j++){
-			if(temp->priority > temp->anterior->priority){
-				t = temp;
-				temp = temp->anterior;
-				temp->anterior = t;
-			}
-		}
-	printf("\n\n PROC.\tB.T.");
-		for(i=0;i<n;i++)
-			printf("\n %d\t%d",temp->pid,temp->burst);
-
-		sumw = temp->wt = 0;
-		sumt = temp->ta = temp->burst;
-
-		for(i=1;i<n;i++){
-			temp->wt = (temp[i-1].burst + temp[i-1].wt);
-			temp->ta = (temp->wt + temp->burst);
-			sumw+=temp->wt;
-			sumt+=temp->ta;
-		}
-		avgwt = (float)sumw/n;
-		avgta = (float)sumt/n;
-		printf("\n\n PROC.\tB.T.\tW.T\tT.A.T");
-		for(i=0;i<n;i++)
-			printf("\n %s\t%d\t%d\t%d",temp->pid,temp->burst,temp->wt,temp->ta);
-		
-		printf("\n\n GANTT CHART\n ");
-		for(i=0;i<n;i++)
-			printf("   %s   ",temp->pid);
-			printf("\n ");
-			printf("0\t");
-
-		for(i=1;i<=n;i++){
-			x+=temp[i-1].burst;
-			printf("%d      ",x);
-		}
-		//printf("\n\n Average waiting time = %0.2f\n Average turn-around = %0.2f.",avgwt,avgta);
-
+	// proceso_ptr temp = front;
+	// proceso_ptr t;
+	// sleep(5);
+	// if(cant_cola!=0){
+	// 	while(temp->anterior!=NULL){
+	// 		proceso_ptr aux = temp->anterior;
+	// 		//temp es 
+	// 		if (temp->anterior->priority < temp->priority){
+	// 			aux = temp;
+	// 			temp = temp->anterior;
+	// 			temp->anterior= aux;
+	// 		}
+	// 		temp = temp->anterior;
+	// 	}
+	// }
 }
 void SJF(){
 	int sumw=0,sumt=0;
@@ -206,6 +232,7 @@ void RR(){
 }
 
 void FCFS(){
+
 
 	int cant_cola = cola_size();
 	int n = 0;
@@ -248,11 +275,11 @@ void FCFS(){
 		}
 		printf("\n %d\t%d\t%d\t%d",temp1->pid,temp1->burst,temp1->wt,temp1->ta);
 		
-		
 	}
 }
 
 void *job_scheduler(void * sockfd){
+	printf("ALGORITMO JOB SCH %d", algoritmo);
 	char buff[MAX]; 
 	char str;
 	int pid=0;
@@ -297,15 +324,21 @@ void *job_scheduler(void * sockfd){
 			temp_proccess->ejecutado=0;
 			procesos_cola++;
 			cant_procesos++;
-			
-			push(*temp_proccess);
 
+			if(algoritmo==1){
+				push(*temp_proccess);
+			}
+			else if(algoritmo==2){
+				push_hpf(*temp_proccess);
+			}
+			else if(algoritmo==3){
+				push_sjf(*temp_proccess);
+			}
+			else if(algoritmo ==4){
+				push(*temp_proccess);
+			}
 		}
 		//NO BORRAR : CODIGO DE POP
-		// proceso_ptr temp_proccess2 = (proceso_ptr) malloc(sizeof (struct proceso));
-		// temp_proccess2= pop();
-		// printf("POP: %d", temp_proccess2->pid);	
-		 
 			// pthread_exit(0);
 	} 
 }
@@ -326,7 +359,12 @@ void *cpu_scheduler(void *algoritmo){
 			}
 		}
 		else if (algoritmo ==2){
-			printf("SJF");
+			// if(is_empty()){
+			// 	int a =1;
+			// 	//printf("\nThe queue is empty!\n");
+			// }else{
+			// 	HPF();
+			// }
 		}
 		else if (algoritmo ==3){
 			printf("HPF");
