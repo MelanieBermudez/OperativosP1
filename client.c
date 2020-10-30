@@ -111,7 +111,7 @@ void func(int sockfd, int modo,int rangomin,int rangomax,int tasa)
 
 int main() 
 { 
-	srand (time(NULL));
+	srand (5);
 	int sockfd, connfd; 
 	struct sockaddr_in servaddr, cli; 
 	// socket create and varification 
