@@ -331,6 +331,7 @@ void SJF(){
 		printf("\n %d\t%d\t%d\t%d",temp1->pid,temp1->burst,temp1->wt,temp1->ta);
 	}
 }
+
 void RR(){
 	int cant_cola = cola_size();
 	int n = 0;
@@ -413,35 +414,49 @@ void RR(){
 }
 
 void FCFS(){
+	int sumw=0,sumt=0;
+	int wt=0;
+	int x = 0;
+	float avgwt=0.0,avgta=0.0;
 	int cant_cola = cola_size();
 	int n = 0;
 	n = procesos_cola;
 	proceso_ptr temp = front;
 	sleep(5);
 	if(cant_cola!=0){
-		while(temp->anterior != NULL){
-			temp->wt = wt; //ta del temp-1 o la suma de los burst que ya se ejecutaron
-			temp->ta = temp->wt+temp->burst;
-			sumw+= wt;
-			sumt+=temp->ta;
-			wt+= temp->burst;
-			printf("\nEjecutando proceso: %d Burst: %d Prioridad: %d \n", temp->pid ,temp->burst, temp->priority );
-			sleep(temp->burst);
-			temp = temp->anterior;
-			proceso_ptr temp_proccess2 = (proceso_ptr) malloc(sizeof (struct proceso));
-			temp_proccess2= pop();
-			printf("Proceso ejecutado terminado:  %d\n", temp_proccess2->pid);
-			push_ejecutados(*temp_proccess2);
-		}
-		printf("Ejecutando proceso: %d Burst: %d Prioridad: %d \n", temp->pid ,temp->burst, temp->priority );
+		//for(i=1;i<n;i++){
+			while(temp->anterior != NULL){
+				temp->wt = wt; //ta del temp-1 o la suma de los burst que ya se ejecutaron
+				temp->ta = temp->wt+temp->burst;
+				sumw+= wt;
+				sumt+=temp->ta;
+				wt+= temp->burst;
+				printf("\nEjecutando proceso: %d Burst: %d Prioridad: %d \n", temp->pid ,temp->burst, temp->priority );
+				sleep(temp->burst);
+				temp = temp->anterior;
+				proceso_ptr temp_proccess2 = (proceso_ptr) malloc(sizeof (struct proceso));
+				temp_proccess2= pop();
+				// printf("------------------------------------------------ \n" );
+				printf("Proceso ejecutado terminado:  %d\n", temp_proccess2->pid);
+				push_ejecutados(*temp_proccess2);
+			}
+		// printf("------------------------------------------------ \n" );
+		printf("\nEjecutando proceso: %d Burst: %d Prioridad: %d \n", temp->pid ,temp->burst, temp->priority );
 		sleep(temp->burst);
-		temp->wt = wt; 
+		//proc_ejecutados_front->anterior;
+		temp->wt = wt; //(temp->anterior->ta); //ta del temp-1 o la sumw de los burst que ya se ejecutaron
 		temp->ta =  temp->wt +  temp->burst;
+		// sumt+=temp->ta;
 		cant_cola--;
+
 		proceso_ptr temp_proccess2 = (proceso_ptr) malloc(sizeof (struct proceso));
 		temp_proccess2= pop();
-		printf("\nProceso ejecutado terminado: %d \n", temp_proccess2->pid);
+		printf("Proceso ejecutado terminado: %d \n", temp_proccess2->pid);
 		push_ejecutados(*temp_proccess2);
+
+		avgwt = (float)sumw/cant_procesos;
+		avgta = (float)sumt/cant_procesos;
+		// display_ejecutados();
 		printf("\n\n PROC.\tB.T.\tW.T\tT.A.T");
 		proceso_ptr temp1 = proc_ejecutados_front;
 		while(temp1->anterior != NULL){
@@ -449,6 +464,7 @@ void FCFS(){
 			temp1 = temp1->anterior;
 		}
 		printf("\n %d\t%d\t%d\t%d",temp1->pid,temp1->burst,temp1->wt,temp1->ta);
+		// printf("\n\n Average waiting time = %0.2f - Average turn-around = %0.2f.",avgwt,avgta);
 	}
 }
 
@@ -475,6 +491,7 @@ void *job_scheduler(void * sockfd){
 			close(sockfd); 
 		}
 		else{
+		if(opcion !=0){
 			char *char_priority = strtok(NULL," ");
 			int int_burst=0;
 			int int_priority=0;
@@ -511,6 +528,7 @@ void *job_scheduler(void * sockfd){
 			}
 
 		}
+		}
 		// display();
 		//NO BORRAR : CODIGO DE POP
 			// pthread_exit(0);
@@ -529,7 +547,7 @@ void *cpu_scheduler(void *algoritmo){
 				//display_ejecutados();
 				avgwt = (float)sumw/cant_procesos;
 				avgta = (float)sumt/cant_procesos;
-				printf("\n\n Average waiting time = %0.2f - Average turn-around = %0.2f.",avgwt,avgta);
+				// printf("\n\n Average waiting time = %0.2f - Average turn-around = %0.2f.",avgwt,avgta);
 			}
 		}
 		else if (algoritmo ==2){
@@ -557,7 +575,7 @@ void *cpu_scheduler(void *algoritmo){
 				//display_ejecutados();
 				avgwt = (float)sumw/cant_procesos;
 				avgta = (float)sumt/cant_procesos;
-				printf("\n\n Average waiting time = %0.2f - Average turn-around = %0.2f.",avgwt,avgta);
+				//printf("\n\n Average waiting time = %0.2f - Average turn-around = %0.2f.",avgwt,avgta);
 			}
 
 
@@ -565,6 +583,29 @@ void *cpu_scheduler(void *algoritmo){
 		}
 	}
 	
+}
+
+void calcular_avg(){
+	int avg_wt=0;
+	int avg_ta=0;  
+	int cont = 0;
+	proceso_ptr temp = proc_ejecutados_front;
+	while(temp != NULL){
+		avg_wt += temp->wt;
+		avg_ta += temp->ta;
+		temp = temp->anterior;
+		cont++;
+	}
+	printf("Promedio WT: %f\n ",(float) avg_wt/cont);
+	printf("Promedio TA: %f \n", (float)avg_ta/cont);
+	printf("\n");
+}
+
+void display_todo(){
+	calcular_avg();
+	display();
+	display_ejecutados();
+
 }
 void* verificar_cola(){
 	int n;
@@ -577,9 +618,12 @@ void* verificar_cola(){
 			display_ejecutados();
 		}
 		else if(n==7){
-			opcion=0;
-			pthread_exit(0);
-			// break;
+			display_todo();
+			//close(sockfd); 
+			exit(0);
+			// opcion=0;
+			// pthread_exit(0);
+			// // break;
 		}
 	}
 }
