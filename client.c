@@ -25,9 +25,10 @@ void* verificar_cola(){
 	for(;;){
 		scanf("%d", &opt);
 		if(opt==0){
+			exit(0);
 			printf("es 0");
-			cancel=0;
 			pthread_exit(0);
+			cancel=0;
 		}
 	}
 }
@@ -162,4 +163,4 @@ int main()
 	}
 	// close the socket 
 	// close(sockfd); 
-} 
+}
