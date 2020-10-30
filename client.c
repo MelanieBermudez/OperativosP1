@@ -92,7 +92,6 @@ void func(int sockfd, int modo,int rangomin,int rangomax,int tasa)
 			buff[1]=' ';
 			buff[2]=prioridad+'0';
 			buff[3]='\0';
-			printf("buff%s",buff);
 			SendThread * args = malloc(sizeof *args);
 			args ->socketfd = &sockfd;
 			args ->buffer = &buff;

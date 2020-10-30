@@ -43,6 +43,11 @@ typedef struct proceso {
 
 proceso_ptr front = NULL;
 proceso_ptr rear = NULL;
+clock_t end_programa ;
+clock_t inicio_cpu;
+clock_t final_cpu;
+clock_t inicio_programa;
+
 
 proceso_ptr proc_ejecutados_front = NULL;
 proceso_ptr proc_ejecutados_rear = NULL;
@@ -230,9 +235,6 @@ proceso_ptr pop_index(int index)
 
 }
 
- 
-
-
 int cola_size(){
 	int n =0;
 	if(is_empty()){
@@ -275,7 +277,6 @@ void RR(){
 			}else{
 					
 				int resta= temp->ejecutado- quantum;
-				printf("resta%d",resta);
 				temp->wt = wt; 
 				temp->ta = temp->wt+quantum;
 				sumw+= wt;
@@ -409,8 +410,6 @@ void HPF(){
 	}
 }
 
-
-
 void FCFS(){
 	int sumw=0,sumt=0;
 	int wt=0;
@@ -434,11 +433,9 @@ void FCFS(){
 
 				proceso_ptr temp_proccess2 = (proceso_ptr) malloc(sizeof (struct proceso));
 				temp_proccess2= pop();
-				// printf("------------------------------------------------ \n" );
 				printf("Proceso ejecutado terminado:  %d\n", temp_proccess2->pid);
 				push_ejecutados(*temp_proccess2);
 			}
-		// printf("------------------------------------------------ \n" );
 		printf("\nEjecutando proceso: %d Burst: %d Prioridad: %d \n", temp->pid ,temp->burst, temp->priority );
 		sleep(temp->burst);
 		//proc_ejecutados_front->anterior;
@@ -536,6 +533,7 @@ void *cpu_scheduler(void *algoritmo){
 	
 	int n; 
 	for(;;){
+		inicio_cpu+= clock();
 		if (algoritmo ==1){
 			if(is_empty()){
 				int a =1;
@@ -566,16 +564,17 @@ void *cpu_scheduler(void *algoritmo){
 
 			if(is_empty()){
 				int a =1;
-			}else{
-				
-				sleep(30);
+			}else{				
+				sleep(15);
 				RR();
 			}
 
 
 
 		}
+	final_cpu +=clock(); 
 	}
+
 	
 }
 
@@ -601,7 +600,13 @@ void display_todo(){
 	
 	display();
 	display_ejecutados();
+	end_programa = clock();
 
+	double time_spent = (double)(end_programa - inicio_programa) / CLOCKS_PER_SEC;
+	double time_cpu = (double)(final_cpu - inicio_cpu) / CLOCKS_PER_SEC;
+	double time_spet = (double)(time_spent-time_cpu); 
+
+	printf("CPU OCIOSO %d ",time_spent/2);
 		
 	printf("\n\n PROC.\tB.T.\tW.T\tT.A.T\tPrioridad");
 	proceso_ptr temp1 = proc_ejecutados_front;
@@ -694,7 +699,7 @@ int main()
 	pthread_t job_scheduler_thread;
 	pthread_t cpu_scheduler_thread;
 	pthread_t cola_thread;
-	clock_t inicio_programa= clock();
+	inicio_programa= clock();
 	pthread_create(&job_scheduler_thread,NULL, job_scheduler,(int *) connfd);
 	
 	pthread_create(&cpu_scheduler_thread,NULL, cpu_scheduler,(int* ) algoritmo);
@@ -705,7 +710,6 @@ int main()
 	pthread_join(cola_thread,NULL);
 
 	display();
-	clock_t end = clock();
-	double time_spent = (double)(end - inicio_programa) / CLOCKS_PER_SEC;
+
 	close(sockfd); 
 }
