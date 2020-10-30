@@ -22,7 +22,7 @@ int sumw=0,sumt=0;
 int wt=0;
 int x = 0;
 float avgwt=0.0,avgta=0.0;
-
+int opcion=1;
  
 typedef struct proceso {
 	int pid;
@@ -31,7 +31,6 @@ typedef struct proceso {
 	bool estado;
 	int ejecutado;
 	int wt,ta;
-	int flag;
 	struct proceso *anterior;
 
  }*proceso_ptr;
@@ -60,8 +59,22 @@ void display(){
 	printf("\n Cola Ready \n Procesos:  ");
 	while(temp != NULL){
 		printf("\033[0;31m");
-		printf("[%d]", temp->priority);
+		printf("[%d]", temp->pid);
 		printf("\033[0m;");
+		temp = temp->anterior;
+	}
+	printf("\n");
+}
+void display_ejecutados(){
+	if(is_empty_ejec()){
+		printf("\nCola ejecutados vacia!\n");
+		return;
+	}
+	proceso_ptr temp = proc_ejecutados_front;
+	printf("\nCola ejecutado\n Procesos: ");
+	while(temp != NULL){
+		//printf("- [%d], [%d], [%d] -", temp->pid,temp->burst,temp->priority);
+		printf("[%d]", temp->pid);
 		temp = temp->anterior;
 	}
 	printf("\n");
@@ -76,7 +89,7 @@ void push(struct proceso p)
 	item->ejecutado=p.ejecutado;
 	item->estado=p.estado;
 	item->ta=p.ta;
-	item->wt=p.wt; 
+	item->wt=p.wt;
 	//item->anterior=NULL;
 	if(rear == NULL)
 		front = rear = item;
@@ -143,7 +156,6 @@ void push_hpf(struct proceso p){
 	}
 }
 	
-
 void push_sjf(struct proceso p){
 
 	proceso_ptr item = (proceso_ptr) malloc(sizeof(struct proceso));
@@ -183,6 +195,7 @@ void push_sjf(struct proceso p){
 	}
 }
 void push_rr(struct proceso p){}
+
 proceso_ptr pop()
 {
 	proceso_ptr temp = front;
@@ -190,22 +203,29 @@ proceso_ptr pop()
 	return temp;
 
 }
+proceso_ptr pop_index(int index)
+{	
+
+	int size= cola_size();
+	int cont=1;
+	
+	proceso_ptr temp = front;
+	
+	while(temp->anterior!=NULL)
+	{
+
+		if(temp->pid != index){
+			push(*temp);
+		}
+		temp= temp->anterior;
+	}
+
+	return temp;
+
+}
+
  
 
-void display_ejecutados(){
-	if(is_empty_ejec()){
-		printf("\nCola ejecutados vacia!\n");
-		return;
-	}
-	proceso_ptr temp = proc_ejecutados_front;
-	printf("\nCola ejecutado\n Procesos: ");
-	while(temp != NULL){
-		//printf("- [%d], [%d], [%d] -", temp->pid,temp->burst,temp->priority);
-		printf("[%d]", temp->pid);
-		temp = temp->anterior;
-	}
-	printf("\n");
-}
 
 int cola_size(){
 	int n =0;
@@ -240,7 +260,7 @@ void HPF()
 			temp = temp->anterior;
 			proceso_ptr temp_proccess2 = (proceso_ptr) malloc(sizeof (struct proceso));
 			temp_proccess2= pop();
-			printf("Proceso ejecutado terminado:  %d\n", temp_proccess2->pid);
+			printf("Proceso ejecutado  terminado:  %d\n", temp_proccess2->pid);
 			push_ejecutados(*temp_proccess2);
 		}
 		printf("Ejecutando proceso: %d Burst: %d Prioridad: %d \n", temp->pid ,temp->burst, temp->priority );
@@ -299,6 +319,9 @@ void SJF(){
 		temp_proccess2= pop();
 		printf("\nProceso ejecutado terminado: %d \n", temp_proccess2->pid);
 		push_ejecutados(*temp_proccess2);
+
+
+		
 		printf("\n\n PROC.\tB.T.\tW.T\tT.A.T");
 		proceso_ptr temp1 = proc_ejecutados_front;
 		while(temp1->anterior != NULL){
@@ -308,13 +331,8 @@ void SJF(){
 		printf("\n %d\t%d\t%d\t%d",temp1->pid,temp1->burst,temp1->wt,temp1->ta);
 	}
 }
-void RR(){
-	int pflag=0,t,tcurr=0,k,i,Q=0;
-	int sumw=0,sumt=0;
-	float avgwt=0.0,avgta=0.0;
-}
 
-void FCFS(){
+void RR(){
 	int cant_cola = cola_size();
 	int n = 0;
 	n = procesos_cola;
@@ -322,28 +340,123 @@ void FCFS(){
 	sleep(5);
 	if(cant_cola!=0){
 		while(temp->anterior != NULL){
-			temp->wt = wt; //ta del temp-1 o la suma de los burst que ya se ejecutaron
-			temp->ta = temp->wt+temp->burst;
-			sumw+= wt;
-			sumt+=temp->ta;
-			wt+= temp->burst;
-			printf("\nEjecutando proceso: %d Burst: %d Prioridad: %d \n", temp->pid ,temp->burst, temp->priority );
-			sleep(temp->burst);
-			temp = temp->anterior;
-			proceso_ptr temp_proccess2 = (proceso_ptr) malloc(sizeof (struct proceso));
-			temp_proccess2= pop();
-			printf("Proceso ejecutado terminado:  %d\n", temp_proccess2->pid);
-			push_ejecutados(*temp_proccess2);
+			printf("PROCESP%d\n",temp->pid);
+			if(temp->burst <= quantum){
+				printf("mayor%d",temp->burst);
+				temp->wt = wt; //ta del temp-1 o la suma de los burst que ya se ejecutaron
+				temp->ta = temp->wt+temp->burst;
+				sumw+= wt;
+				sumt+=temp->ta;
+				wt+= temp->burst;
+				printf("\nEjecutando proceso: %d Burst: %d Prioridad: %d \n", temp->pid ,temp->burst, temp->priority );
+				sleep(temp->burst);
+				proceso_ptr temp_proccess2 = (proceso_ptr) malloc(sizeof (struct proceso));
+				temp_proccess2= pop();
+				temp_proccess2->estado= true;
+				push_ejecutados(*temp);
+			}else{
+					
+				int resta= temp->burst- quantum;
+				printf("resta%d",resta);
+				temp->wt = wt; 
+				temp->ta = temp->wt+quantum;
+				sumw+= wt;
+				sumt+=temp->ta;
+				wt+= quantum;
+				printf("\nEjecutando proceso %d con quatum  %d\n", temp->pid, quantum);
+				sleep(quantum);
+				temp->burst= resta;
+				printf("temp->burst%d",temp->burst);
+				proceso_ptr temp_proccess2 = (proceso_ptr) malloc(sizeof (struct proceso));
+				temp_proccess2= pop();
+				temp_proccess2->estado= false;
+				push(*temp);
+			}		
+			temp = temp->anterior;			
 		}
-		printf("Ejecutando proceso: %d Burst: %d Prioridad: %d \n", temp->pid ,temp->burst, temp->priority );
+		printf("\n burst temp antes del while %d", temp->burst);
+		while(temp->burst > 0){
+			printf("\nultimo proceso %d  \n", temp->burst);
+
+			if( temp->burst >= quantum){
+				printf("\nultimo proceso en el if %d  \n", temp->burst);
+				int resta= temp->burst- quantum;
+				temp->wt = wt; 
+				temp->ta =  temp->wt + quantum;
+				cant_cola--;
+				temp->burst= resta;
+				printf("\nEjecutadno proceso con %d burst  %d  \n", temp->pid,temp->burst);
+			}else{
+				int resta= temp->burst- quantum;
+				printf("\n else ultimo ultimo burst %d  \n",temp->burst);
+				temp->wt = wt; //ta del temp-1 o la suma de los burst que ya se ejecutaron
+				temp->ta = temp->wt+temp->burst;
+				sumw+= wt;
+				sumt+=temp->ta;
+				wt+= temp->burst;
+				temp->burst= 0;
+				printf("\nProceso ejecutado terminado: %d \n", temp->pid);
+				proceso_ptr temp_proccess2 = (proceso_ptr) malloc(sizeof (struct proceso));
+				temp_proccess2= pop();
+				//sleep(4);
+				temp_proccess2->estado= true;
+				push_ejecutados(*temp);
+			}
+		}
+		proceso_ptr temp1 = proc_ejecutados_front;
+		printf("\n\n PROC.\tB.T.\tW.T\tT.A.T");
+		while(temp1->anterior != NULL){
+			printf("\n %d\t%d\t%d\t%d",temp1->pid,temp1->ejecutado,temp1->wt,temp1->ta);
+			temp1 = temp1->anterior;
+		}
+		printf("\n %d\t%d\t%d\t%d",temp1->pid,temp1->ejecutado,temp1->wt,temp1->ta);
+	}
+}
+
+void FCFS(){
+	int sumw=0,sumt=0;
+	int wt=0;
+	int x = 0;
+	float avgwt=0.0,avgta=0.0;
+	int cant_cola = cola_size();
+	int n = 0;
+	n = procesos_cola;
+	proceso_ptr temp = front;
+	sleep(5);
+	if(cant_cola!=0){
+		//for(i=1;i<n;i++){
+			while(temp->anterior != NULL){
+				temp->wt = wt; //ta del temp-1 o la suma de los burst que ya se ejecutaron
+				temp->ta = temp->wt+temp->burst;
+				sumw+= wt;
+				sumt+=temp->ta;
+				wt+= temp->burst;
+				printf("\nEjecutando proceso: %d Burst: %d Prioridad: %d \n", temp->pid ,temp->burst, temp->priority );
+				sleep(temp->burst);
+				temp = temp->anterior;
+				proceso_ptr temp_proccess2 = (proceso_ptr) malloc(sizeof (struct proceso));
+				temp_proccess2= pop();
+				// printf("------------------------------------------------ \n" );
+				printf("Proceso ejecutado terminado:  %d\n", temp_proccess2->pid);
+				push_ejecutados(*temp_proccess2);
+			}
+		// printf("------------------------------------------------ \n" );
+		printf("\nEjecutando proceso: %d Burst: %d Prioridad: %d \n", temp->pid ,temp->burst, temp->priority );
 		sleep(temp->burst);
-		temp->wt = wt; 
+		//proc_ejecutados_front->anterior;
+		temp->wt = wt; //(temp->anterior->ta); //ta del temp-1 o la sumw de los burst que ya se ejecutaron
 		temp->ta =  temp->wt +  temp->burst;
+		// sumt+=temp->ta;
 		cant_cola--;
+
 		proceso_ptr temp_proccess2 = (proceso_ptr) malloc(sizeof (struct proceso));
 		temp_proccess2= pop();
-		printf("\nProceso ejecutado terminado: %d \n", temp_proccess2->pid);
+		printf("Proceso ejecutado terminado: %d \n", temp_proccess2->pid);
 		push_ejecutados(*temp_proccess2);
+
+		avgwt = (float)sumw/cant_procesos;
+		avgta = (float)sumt/cant_procesos;
+		// display_ejecutados();
 		printf("\n\n PROC.\tB.T.\tW.T\tT.A.T");
 		proceso_ptr temp1 = proc_ejecutados_front;
 		while(temp1->anterior != NULL){
@@ -351,6 +464,7 @@ void FCFS(){
 			temp1 = temp1->anterior;
 		}
 		printf("\n %d\t%d\t%d\t%d",temp1->pid,temp1->burst,temp1->wt,temp1->ta);
+		printf("\n\n Average waiting time = %0.2f - Average turn-around = %0.2f.",avgwt,avgta);
 	}
 }
 
@@ -377,6 +491,7 @@ void *job_scheduler(void * sockfd){
 			close(sockfd); 
 		}
 		else{
+		if(opcion !=0){
 			char *char_priority = strtok(NULL," ");
 			int int_burst=0;
 			int int_priority=0;
@@ -389,13 +504,13 @@ void *job_scheduler(void * sockfd){
 			bzero(str, sizeof(str)); 
 			write(sockfd, respuesta, sizeof(respuesta)); 
 			bzero(respuesta, sizeof(respuesta)); 
-
+			printf("\nbusst %d, priori %d\n",int_burst,int_priority);
 			temp_proccess->pid= pid;
 			temp_proccess->burst= int_burst;
 			temp_proccess->priority= int_priority;
 			temp_proccess->anterior= NULL;
 			temp_proccess->estado=false;
-			temp_proccess->ejecutado=0;
+			temp_proccess->ejecutado=int_burst;
 			procesos_cola++;
 			cant_procesos++;
 
@@ -412,6 +527,7 @@ void *job_scheduler(void * sockfd){
 				push(*temp_proccess);
 			}
 
+		}
 		}
 		// display();
 		//NO BORRAR : CODIGO DE POP
@@ -455,7 +571,7 @@ void *cpu_scheduler(void *algoritmo){
 			int a =1;
 				//printf("\nThe queue is empty!\n");
 			}else{
-				FCFS();
+				RR();
 				//display_ejecutados();
 				avgwt = (float)sumw/cant_procesos;
 				avgta = (float)sumt/cant_procesos;
@@ -479,7 +595,11 @@ void* verificar_cola(){
 			display_ejecutados();
 		}
 		else if(n==7){
-			break;
+			close(sockfd); 
+			exit(0);
+			// opcion=0;
+			// pthread_exit(0);
+			// // break;
 		}
 	}
 }
