@@ -464,7 +464,7 @@ void FCFS(){
 			temp1 = temp1->anterior;
 		}
 		printf("\n %d\t%d\t%d\t%d",temp1->pid,temp1->burst,temp1->wt,temp1->ta);
-		printf("\n\n Average waiting time = %0.2f - Average turn-around = %0.2f.",avgwt,avgta);
+		// printf("\n\n Average waiting time = %0.2f - Average turn-around = %0.2f.",avgwt,avgta);
 	}
 }
 
@@ -547,7 +547,7 @@ void *cpu_scheduler(void *algoritmo){
 				//display_ejecutados();
 				avgwt = (float)sumw/cant_procesos;
 				avgta = (float)sumt/cant_procesos;
-				printf("\n\n Average waiting time = %0.2f - Average turn-around = %0.2f.",avgwt,avgta);
+				// printf("\n\n Average waiting time = %0.2f - Average turn-around = %0.2f.",avgwt,avgta);
 			}
 		}
 		else if (algoritmo ==2){
@@ -575,7 +575,7 @@ void *cpu_scheduler(void *algoritmo){
 				//display_ejecutados();
 				avgwt = (float)sumw/cant_procesos;
 				avgta = (float)sumt/cant_procesos;
-				printf("\n\n Average waiting time = %0.2f - Average turn-around = %0.2f.",avgwt,avgta);
+				//printf("\n\n Average waiting time = %0.2f - Average turn-around = %0.2f.",avgwt,avgta);
 			}
 
 
@@ -583,6 +583,29 @@ void *cpu_scheduler(void *algoritmo){
 		}
 	}
 	
+}
+
+void calcular_avg(){
+	int avg_wt=0;
+	int avg_ta=0;  
+	int cont = 0;
+	proceso_ptr temp = proc_ejecutados_front;
+	while(temp != NULL){
+		avg_wt += temp->wt;
+		avg_ta += temp->ta;
+		temp = temp->anterior;
+		cont++;
+	}
+	printf("Promedio WT: %f\n ",(float) avg_wt/cont);
+	printf("Promedio TA: %f \n", (float)avg_ta/cont);
+	printf("\n");
+}
+
+void display_todo(){
+	calcular_avg();
+	display();
+	display_ejecutados();
+
 }
 void* verificar_cola(){
 	int n;
@@ -595,7 +618,8 @@ void* verificar_cola(){
 			display_ejecutados();
 		}
 		else if(n==7){
-			close(sockfd); 
+			display_todo();
+			//close(sockfd); 
 			exit(0);
 			// opcion=0;
 			// pthread_exit(0);
